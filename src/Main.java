@@ -1,167 +1,88 @@
-import Kanban.Managers.TaskManager;
-import Kanban.Tasks.*;
+import kanban.managers.TaskManager;
+import kanban.tasks.*;
+
+import java.util.ArrayList;
 
 public class Main {
 
     public static void main(String[] args) {
         TaskManager planner = new TaskManager();
 
-        System.out.println("===== TEST PHASE A:");
-        if (planner.addNewTask(new Task("Simple task A", "Description simple task A."))) {
-            System.out.println("Simple task A added.");
-        } else {
-            System.out.println("Task A adding fail.");
+        System.out.println("Phase A: Adding tasks:");
+        planner.addTask(new Task("Task A", "Description of task A"));
+        planner.addTask(new Task("Task B", "Description of task B"));
+        planner.addEpic(new Epic("Epic A", "Description of task A"));
+        planner.addSub(new SubTask("Subtask A of Epic A", "Description of Subtask A"), planner.getEpicByID(planner.getGlobalID()));
+        planner.addSub(new SubTask("Subtask B of Epic A", "Description of Subtask B"), planner.getEpicByID(planner.getGlobalID() - 1));
+        planner.addEpic(new Epic("Epic B", "Description of task B"));
+        planner.addSub(new SubTask("Subtask A of Epic B", "Description of Subtask A"), planner.getEpicByID(planner.getGlobalID()));
+        showTaskList(planner.getTaskList());
+        showEpicList(planner.getEpicList());
+
+        System.out.println("Phase B: Change status of task");
+        planner.setTaskStatus(planner.getTaskByID(2), TaskStatus.IN_PROGRESS);
+        planner.setSubsStatus(planner.getSubTaskByID(5), TaskStatus.IN_PROGRESS);
+        planner.setSubsStatus(planner.getSubTaskByID(7), TaskStatus.DONE);
+        showTaskList(planner.getTaskList());
+        showEpicList(planner.getEpicList());
+
+        System.out.println("Phase C: Remove task");
+        planner.removeTaskByID(planner.getTaskByID(2));
+        planner.removeSubsByID(planner.getSubTaskByID(5));
+        planner.removeEpicByID(planner.getEpicByID(6));
+        showTaskList(planner.getTaskList());
+        showEpicList(planner.getEpicList());
+    }
+
+    public static void showTaskList(ArrayList<Task> taskList) {
+        for (Task task : taskList) showTask(task);
+    }
+
+    public static void showEpicList(ArrayList<Epic> epicList) {
+        for (Epic epic : epicList) {
+            showTask(epic);
+            if (!epic.getSubTaskList().isEmpty()) {
+                for (SubTask subTask : epic.getSubTaskList()) showTask(subTask);
+            } else {
+                System.out.println("SUBTASK LIST: EMPTY");
+            }
         }
+    }
 
-        if (planner.addNewTask(new Task("Simple task B", "Description simple task B."))) {
-            System.out.println("Simple task B added.");
-        } else {
-            System.out.println("Task B adding fail.");
+    public static void showTask(Object taskObject) {
+        if (taskObject instanceof Epic epicTask) {
+            show("EPIC", epicTask.getStatus(), epicTask.getID(),
+                    epicTask.getName(), epicTask.getDescription());
+        } else if (taskObject instanceof SubTask subsTask) {
+            show("SUBS", subsTask.getStatus(), subsTask.getID(),
+                    subsTask.getName(), subsTask.getDescription());
+        } else if (taskObject instanceof Task simpleTask) {
+            show("TASK", simpleTask.getStatus(), simpleTask.getID(),
+                    simpleTask.getName(), simpleTask.getDescription());
         }
-
-        if (planner.addNewTask(new Epic("Epic task A", "Description epic task A."))) {
-            System.out.println("Epic task A added.");
-        } else {
-            System.out.println("Epic A adding fail.");
-        }
-
-        if (planner.addNewTask(3, new SubTask(3, "Epic task A Subtask A", "Description epic task A Subtask A."))) {
-            System.out.println("Epic task A Subtask A added.");
-        } else {
-            System.out.println("Epic task A Subtask A adding fail.");
-        }
-
-        if (planner.addNewTask(3, new SubTask(3, "Epic task A Subtask B", "Description epic task A Subtask B."))) {
-            System.out.println("Epic task A Subtask B added.");
-        } else {
-            System.out.println("Epic task A Subtask B adding fail.");
-        }
-
-        if (planner.addNewTask(new Epic("Epic task B", "Description epic task B."))) {
-            System.out.println("Epic task B added.");
-        } else {
-            System.out.println("Epic B adding fail.");
-        }
-
-        if (planner.addNewTask(6, new SubTask(6, "Epic task B Subtask A", "Description epic task B Subtask A."))) {
-            System.out.println("Epic task B Subtask A added.");
-        } else {
-            System.out.println("Epic task B Subtask A adding fail.");
-        }
-
-        System.out.println("===== TaskByType:");
-        System.out.println("\nTask:");
-        System.out.println(planner.getTaskListByType(TaskType.TASK));
-        System.out.println("Epic:");
-        System.out.println(planner.getTaskListByType(TaskType.EPIC));
-        System.out.println("Subtask:");
-        System.out.println(planner.getTaskListByType(TaskType.SUB));
-        System.out.println("=".repeat(20));
-        System.out.println();
-        planner.taskListView();
-
-        System.out.println("===== TEST PHASE B:");
-        System.out.println("Changing status in Task A:");
-        if (planner.updateTaskStatusByID(1, TaskStatus.IN_PROGRESS)) {
-            System.out.println("Task A status changed.");
-        } else {
-            System.out.println("Task A status change fail.");
-        }
-
-        System.out.println("Update data in Task B.");
-        if (planner.updateTaskByID(2,
-                new Task("Update Task B.", "Update description Task B"))) {
-            System.out.println("Task B data updated.");
-        } else {
-            System.out.println("Task B data update fail.");
-        }
-
-        System.out.println("Changing status in Task B:");
-        if (planner.updateTaskStatusByID(2, TaskStatus.DONE)) {
-            System.out.println("Task B status changed.");
-        } else {
-            System.out.println("Task B status change fail.");
-        }
-
-        System.out.println("Update data in Epic task A: Subtask A:");
-        if (planner.updateTaskByID(4,
-                new SubTask("Update Epic task A Subtask A", "Update description epic task A Subtask A."))) {
-            System.out.println("Epic task A: Subtask A data updated.");
-        } else {
-            System.out.println("Epic task A: Subtask A data update fail.");
-        }
-
-        System.out.println("Changing status in Epic task A: Subtask A:");
-        if (planner.updateTaskStatusByID(4, TaskStatus.IN_PROGRESS)) {
-            System.out.println("Epic task A: Subtask A status changed.");
-        } else {
-            System.out.println("Epic task A: Subtask A status change fail.");
-        }
-
-        System.out.println("Changing status in Epic task B: Subtask A:");
-        if (planner.updateTaskStatusByID(7, TaskStatus.DONE)) {
-            System.out.println("Epic task B: Subtask A status changed.");
-        } else {
-            System.out.println("Epic task B: Subtask A status change fail.");
-        }
-
-        System.out.println("Update status Epic task A.");
-        if (planner.updateTaskStatusByID(3)) {
-            System.out.println("Epic task A status updated.");
-        } else {
-            System.out.println("Epic task A status update fail.");
-        }
-
-        System.out.println("Update status Epic task B.");
-        if (planner.updateTaskStatusByID(6)) {
-            System.out.println("Epic task B status updated.");
-        } else {
-            System.out.println("Epic task B status update fail.");
-        }
-        System.out.println();
-        planner.taskListView();
-
-        System.out.println("===== TEST PHASE C:");
-        System.out.println("Remove Task A.");
-        if (planner.removeTaskByID(1)) {
-            System.out.println("Task A removed.");
-        } else {
-            System.out.println("Task A remove fail.");
-        }
-
-        System.out.println("Remove Epic task B.");
-        if (planner.removeTaskByID(6)) {
-            System.out.println("Epic task B removed.");
-        } else {
-            System.out.println("Epic task B remove fail.");
-        }
-
-        System.out.println("Remove Epic task A Subtask A.");
-        if (planner.removeTaskByID(4)) {
-            System.out.println("Epic task A Subtask A. removed.");
-        } else {
-            System.out.println("Epic task A Subtask A. remove fail.");
-        }
-        System.out.println("Update status Epic task A.");
-        if (planner.updateTaskStatusByID(3)) {
-            System.out.println("Epic task A status updated.");
-        } else {
-            System.out.println("Epic task A status update fail.");
-        }
-
-        System.out.println("\n===== AllTask:");
-        System.out.println(planner.getAllTaskIDList());
-        System.out.println("\n===== TaskByType:");
-        System.out.println("Task:");
-        System.out.println(planner.getTaskListByType(TaskType.TASK));
-        System.out.println("Epic:");
-        System.out.println(planner.getTaskListByType(TaskType.EPIC));
-        System.out.println("Subtask:");
-        System.out.println(planner.getTaskListByType(TaskType.SUB));
-        System.out.println("=".repeat(20));
-        System.out.println();
-        planner.taskListView();
-
 
     }
+
+    private static void show(String taskType, TaskStatus taskStatus, Integer taskID, String taskTitle,
+                             String taskDescription) {
+        String beforeTaskSpace = "\n".repeat(0);
+        String beforeTaskLimiter = "=".repeat(30);
+        String taskIndent = "\t".repeat(0);
+        String afterTaskLimiter = "".repeat(30);
+        String afterTaskSpace = "\n".repeat(0);
+
+        if (taskType.equals("SUBS")) {
+            beforeTaskSpace = "\n".repeat(0);
+            beforeTaskLimiter = "-".repeat(25);
+            taskIndent = "\t".repeat(1);
+            afterTaskLimiter = "".repeat(10);
+            afterTaskSpace = "\n".repeat(0);
+        }
+        System.out.println(taskIndent + beforeTaskSpace + beforeTaskLimiter);
+        System.out.println(taskIndent + "[" + taskID + "]" + "[" + taskType + "]" + "[" + taskStatus.toString() + "] " + taskTitle);
+        //System.out.println(taskIndent + "Description:");
+        System.out.println(taskIndent + taskDescription);
+        System.out.println(taskIndent + afterTaskLimiter + afterTaskSpace);
+    }
+
 }
