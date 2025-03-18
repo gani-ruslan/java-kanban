@@ -5,7 +5,9 @@ import static kanban.tasks.TaskStatus.*;
 
 public class Task {
 
-    private Integer taskID;
+    protected static Integer globalIDCounter = 1;
+
+    private final Integer taskID;
     private String taskName;
     private String description;
     private TaskStatus taskStatus;
@@ -15,7 +17,7 @@ public class Task {
                 String description) {
         this.taskName = taskName;
         this.description = description;
-        taskID = 0;
+        taskID = globalIDCounter++;
         taskStatus = NEW;
     }
 
@@ -38,10 +40,6 @@ public class Task {
 
     public Integer getID() {
         return taskID;
-    }
-
-    public void setID(Integer taskID) {
-        this.taskID = taskID;
     }
 
     public TaskStatus getStatus() {

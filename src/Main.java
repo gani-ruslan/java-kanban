@@ -11,25 +11,32 @@ public class Main {
         System.out.println("Phase A: Adding tasks:");
         planner.addTask(new Task("Task A", "Description of task A"));
         planner.addTask(new Task("Task B", "Description of task B"));
-        planner.addEpic(new Epic("Epic A", "Description of task A"));
-        planner.addSub(new SubTask("Subtask A of Epic A", "Description of Subtask A"), planner.getEpicByID(planner.getGlobalID()));
-        planner.addSub(new SubTask("Subtask B of Epic A", "Description of Subtask B"), planner.getEpicByID(planner.getGlobalID() - 1));
-        planner.addEpic(new Epic("Epic B", "Description of task B"));
-        planner.addSub(new SubTask("Subtask A of Epic B", "Description of Subtask A"), planner.getEpicByID(planner.getGlobalID()));
+
+        Epic epicTaskA = new Epic("Epic A", "Description of task A");
+        planner.addEpic(epicTaskA);
+        planner.addSub(new SubTask("Subtask A of Epic A", "Description of Subtask A"), epicTaskA);
+        planner.addSub(new SubTask("Subtask B of Epic A", "Description of Subtask B"), epicTaskA);
+
+        Epic epicTaskB = new Epic("Epic B", "Description of task B");
+        planner.addEpic(epicTaskB);
+        planner.addSub(new SubTask("Subtask A of Epic B", "Description of Subtask A"), epicTaskB);
         showTaskList(planner.getTaskList());
         showEpicList(planner.getEpicList());
 
         System.out.println("Phase B: Change status of task");
-        planner.setTaskStatus(planner.getTaskByID(2), TaskStatus.IN_PROGRESS);
-        planner.setSubsStatus(planner.getSubTaskByID(5), TaskStatus.IN_PROGRESS);
-        planner.setSubsStatus(planner.getSubTaskByID(7), TaskStatus.DONE);
+        planner.getTaskByID(2).setStatus(TaskStatus.IN_PROGRESS);
+        planner.getSubTaskByID(5).setStatus(TaskStatus.IN_PROGRESS);
+        planner.getSubTaskByID(5).getParentTask().updateStatus();
+        planner.getSubTaskByID(7).setStatus(TaskStatus.DONE);
+        planner.getSubTaskByID(7).getParentTask().updateStatus();
+
         showTaskList(planner.getTaskList());
         showEpicList(planner.getEpicList());
 
         System.out.println("Phase C: Remove task");
-        planner.removeTaskByID(planner.getTaskByID(2));
-        planner.removeSubsByID(planner.getSubTaskByID(5));
-        planner.removeEpicByID(planner.getEpicByID(6));
+        planner.removeTask(planner.getTaskByID(2));
+        planner.removeSubs(planner.getSubTaskByID(5));
+        planner.removeEpic(planner.getEpicByID(6));
         showTaskList(planner.getTaskList());
         showEpicList(planner.getEpicList());
     }
@@ -84,5 +91,4 @@ public class Main {
         System.out.println(taskIndent + taskDescription);
         System.out.println(taskIndent + afterTaskLimiter + afterTaskSpace);
     }
-
 }

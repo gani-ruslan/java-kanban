@@ -21,7 +21,7 @@ public class Epic extends Task {
         subTaskList.remove(subTask);
     }
 
-    public void updateEpicStatus() {
+    public void updateStatus() {
         int countDoneTask = 0;
         int countInProgressTask = 0;
 
