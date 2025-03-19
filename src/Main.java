@@ -29,14 +29,18 @@ public class Main {
         planner.getSubTaskByID(5).getParentTask().updateStatus();
         planner.getSubTaskByID(7).setStatus(TaskStatus.DONE);
         planner.getSubTaskByID(7).getParentTask().updateStatus();
+        showTaskList(planner.getTaskList());
+        showEpicList(planner.getEpicList());
 
+        System.out.println("Phase B1: Add new subtask in DONE Epic task:");
+        planner.addSub(new SubTask("Subtask B1 of Epic B", "Description of Subtask B1"), epicTaskB);
         showTaskList(planner.getTaskList());
         showEpicList(planner.getEpicList());
 
         System.out.println("Phase C: Remove task");
-        planner.removeTask(planner.getTaskByID(2));
-        planner.removeSubs(planner.getSubTaskByID(5));
-        planner.removeEpic(planner.getEpicByID(6));
+        planner.removeTaskByID(2);
+        planner.removeSubsByID(5);
+        planner.removeEpicByID(6);
         showTaskList(planner.getTaskList());
         showEpicList(planner.getEpicList());
     }

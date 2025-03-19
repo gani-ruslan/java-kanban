@@ -1,6 +1,7 @@
 package kanban.tasks;
 
 import java.util.ArrayList;
+import static kanban.tasks.TaskStatus.*;
 
 public class Epic extends Task {
 
@@ -15,10 +16,12 @@ public class Epic extends Task {
 
     public void addSubTask(SubTask subTask) {
         subTaskList.add(subTask);
+        updateStatus();
     }
 
     public void removeSubTask(SubTask subTask) {
         subTaskList.remove(subTask);
+        updateStatus();
     }
 
     public void updateStatus() {
@@ -26,16 +29,16 @@ public class Epic extends Task {
         int countInProgressTask = 0;
 
         for (SubTask task : subTaskList) {
-            if (task.getStatus() == TaskStatus.IN_PROGRESS) countInProgressTask++;
-            if (task.getStatus() == TaskStatus.DONE) countDoneTask++;
+            if (task.getStatus() == IN_PROGRESS) countInProgressTask++;
+            if (task.getStatus() == DONE) countDoneTask++;
         }
 
         if (countDoneTask > 0 && countDoneTask == subTaskList.size() ) {
-            setStatus(TaskStatus.DONE);
-        } else if (countInProgressTask > 0) {
-            setStatus(TaskStatus.IN_PROGRESS);
+            setStatus(DONE);
+        } else if (countInProgressTask > 0 || countDoneTask > 0) {
+            setStatus(IN_PROGRESS);
         } else {
-            setStatus(TaskStatus.NEW);
+            setStatus(NEW);
         }
     }
 

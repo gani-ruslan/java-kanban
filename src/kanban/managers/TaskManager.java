@@ -1,6 +1,6 @@
 package kanban.managers;
-import kanban.tasks.*;
 
+import kanban.tasks.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -47,10 +47,7 @@ public class TaskManager {
     }
 
     public void removeAllSubs() {
-        for(SubTask subTask : subsStorageMap.values()) {
-            subTask.getParentTask().removeSubTask(subTask);
-            subTask.getParentTask().updateStatus();
-        }
+        for(SubTask subTask : subsStorageMap.values()) subTask.getParentTask().removeSubTask(subTask);
         subsStorageMap.clear();
     }
 
@@ -102,18 +99,17 @@ public class TaskManager {
 
 
     // Remove task (task/epic/sub)
-    public void removeTask(Task task) {
-        taskStorageMap.remove(task.getID());
+    public void removeTaskByID(Integer taskID) {
+        taskStorageMap.remove(taskID);
     }
 
-    public void removeEpic(Epic epic) {
-        for (SubTask subTask : epicStorageMap.get(epic.getID()).getSubTaskList()) subsStorageMap.remove(subTask.getID());
-        epicStorageMap.remove(epic.getID());
+    public void removeEpicByID(Integer epicID) {
+        for (SubTask subTask : epicStorageMap.get(epicID).getSubTaskList()) subsStorageMap.remove(subTask.getID());
+        epicStorageMap.remove(epicID);
     }
 
-    public void removeSubs(SubTask subs) {
-        subsStorageMap.get(subs.getID()).getParentTask().removeSubTask(subsStorageMap.get(subs.getID()));
-        subsStorageMap.get(subs.getID()).getParentTask().updateStatus();
-        subsStorageMap.remove(subs.getID());
+    public void removeSubsByID(Integer subsID) {
+        subsStorageMap.get(subsID).getParentTask().removeSubTask(subsStorageMap.get(subsID));
+        subsStorageMap.remove(subsID);
     }
 }
