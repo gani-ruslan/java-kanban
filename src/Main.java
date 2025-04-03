@@ -1,98 +1,56 @@
+import kanban.managers.InMemoryTaskManager;
+import kanban.managers.Managers;
 import kanban.managers.TaskManager;
 import kanban.tasks.*;
-
-import java.util.ArrayList;
 
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager planner = new TaskManager();
+        TaskManager manager = Managers.getDefault();
 
-        System.out.println("Phase A: Adding tasks:");
-        planner.addTask(new Task("Task A", "Description of task A"));
-        planner.addTask(new Task("Task B", "Description of task B"));
+        Task taskA = new Task("Task A", "Description of task A");
+        Task taskB = new Task("Task B", "Description of task B");
+        Epic epicA = new Epic("Epic A", "Description of task A");
+        Epic epicB = new Epic("Epic B", "Description of task B");
+        SubTask subA = new SubTask("Subtask A of Epic A", "Description of Subtask A");
+        SubTask subB = new SubTask("Subtask B of Epic A", "Description of Subtask B");
+        SubTask subC = new SubTask("Subtask A of Epic B", "Description of Subtask A");
 
-        Epic epicTaskA = new Epic("Epic A", "Description of task A");
-        planner.addEpic(epicTaskA);
-        planner.addSub(new SubTask("Subtask A of Epic A", "Description of Subtask A"), epicTaskA);
-        planner.addSub(new SubTask("Subtask B of Epic A", "Description of Subtask B"), epicTaskA);
+        manager.addTask(taskA);
+        manager.addTask(taskB);
+        manager.addEpic(epicA);
+        manager.addEpic(epicB);
+        manager.addSub(subA);
+        manager.addSub(subB);
+        manager.addSub(subC);
 
-        Epic epicTaskB = new Epic("Epic B", "Description of task B");
-        planner.addEpic(epicTaskB);
-        planner.addSub(new SubTask("Subtask A of Epic B", "Description of Subtask A"), epicTaskB);
-        showTaskList(planner.getTaskList());
-        showEpicList(planner.getEpicList());
+        manager.addSubToEpic(subA.getID(), epicA.getID());
+        manager.addSubToEpic(subB.getID(), epicA.getID());
+        manager.addSubToEpic(subC.getID(), epicB.getID());
 
-        System.out.println("Phase B: Change status of task");
-        planner.getTaskByID(2).setStatus(TaskStatus.IN_PROGRESS);
-        planner.getSubTaskByID(5).setStatus(TaskStatus.IN_PROGRESS);
-        planner.getSubTaskByID(5).getParentTask().updateStatus();
-        planner.getSubTaskByID(7).setStatus(TaskStatus.DONE);
-        planner.getSubTaskByID(7).getParentTask().updateStatus();
-        showTaskList(planner.getTaskList());
-        showEpicList(planner.getEpicList());
+        System.out.println("Pass 1: Init.");
+        for (Task task : manager.getTaskList()) System.out.println(task);
+        for (Epic epic : manager.getEpicList()) System.out.println(epic);
+        for (SubTask sub : manager.getSubList()) System.out.println(sub);
 
-        System.out.println("Phase B1: Add new subtask in DONE Epic task:");
-        planner.addSub(new SubTask("Subtask B1 of Epic B", "Description of Subtask B1"), epicTaskB);
-        showTaskList(planner.getTaskList());
-        showEpicList(planner.getEpicList());
+        manager.getTaskByID(taskA.getID()).setStatus(TaskStatus.IN_PROGRESS);
+        manager.getSubTaskByID(subA.getID()).setStatus(TaskStatus.IN_PROGRESS);
+        manager.updateStatus(epicA.getID());
+        manager.getSubTaskByID(subC.getID()).setStatus(TaskStatus.DONE);
+        manager.updateStatus(epicB.getID());
 
-        System.out.println("Phase C: Remove task");
-        planner.removeTaskByID(2);
-        planner.removeSubsByID(5);
-        planner.removeEpicByID(6);
-        showTaskList(planner.getTaskList());
-        showEpicList(planner.getEpicList());
-    }
+        System.out.println("\nPass 2: Change status");
+        for (Task task : manager.getTaskList()) System.out.println(task);
+        for (Epic epic : manager.getEpicList()) System.out.println(epic);
+        for (SubTask sub : manager.getSubList()) System.out.println(sub);
 
-    public static void showTaskList(ArrayList<Task> taskList) {
-        for (Task task : taskList) showTask(task);
-    }
+        manager.removeTaskByID(taskB.getID());
+        manager.removeSubByID(subA.getID());
+        manager.removeEpicByID(epicB.getID());
 
-    public static void showEpicList(ArrayList<Epic> epicList) {
-        for (Epic epic : epicList) {
-            showTask(epic);
-            if (!epic.getSubTaskList().isEmpty()) {
-                for (SubTask subTask : epic.getSubTaskList()) showTask(subTask);
-            } else {
-                System.out.println("SUBTASK LIST: EMPTY");
-            }
-        }
-    }
-
-    public static void showTask(Object taskObject) {
-        if (taskObject instanceof Epic epicTask) {
-            show("EPIC", epicTask.getStatus(), epicTask.getID(),
-                    epicTask.getName(), epicTask.getDescription());
-        } else if (taskObject instanceof SubTask subsTask) {
-            show("SUBS", subsTask.getStatus(), subsTask.getID(),
-                    subsTask.getName(), subsTask.getDescription());
-        } else if (taskObject instanceof Task simpleTask) {
-            show("TASK", simpleTask.getStatus(), simpleTask.getID(),
-                    simpleTask.getName(), simpleTask.getDescription());
-        }
-
-    }
-
-    private static void show(String taskType, TaskStatus taskStatus, Integer taskID, String taskTitle,
-                             String taskDescription) {
-        String beforeTaskSpace = "\n".repeat(0);
-        String beforeTaskLimiter = "=".repeat(30);
-        String taskIndent = "\t".repeat(0);
-        String afterTaskLimiter = "".repeat(30);
-        String afterTaskSpace = "\n".repeat(0);
-
-        if (taskType.equals("SUBS")) {
-            beforeTaskSpace = "\n".repeat(0);
-            beforeTaskLimiter = "-".repeat(25);
-            taskIndent = "\t".repeat(1);
-            afterTaskLimiter = "".repeat(10);
-            afterTaskSpace = "\n".repeat(0);
-        }
-        System.out.println(taskIndent + beforeTaskSpace + beforeTaskLimiter);
-        System.out.println(taskIndent + "[" + taskID + "]" + "[" + taskType + "]" + "[" + taskStatus.toString() + "] " + taskTitle);
-        //System.out.println(taskIndent + "Description:");
-        System.out.println(taskIndent + taskDescription);
-        System.out.println(taskIndent + afterTaskLimiter + afterTaskSpace);
+        System.out.println("\nPass 3: Remove some task.");
+        for (Task task : manager.getTaskList()) System.out.println(task);
+        for (Epic epic : manager.getEpicList()) System.out.println(epic);
+        for (SubTask sub : manager.getSubList()) System.out.println(sub);
     }
 }

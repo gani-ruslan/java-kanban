@@ -1,48 +1,44 @@
 package kanban.tasks;
 
 import java.util.ArrayList;
-import static kanban.tasks.TaskStatus.*;
 
 public class Epic extends Task {
 
-    private ArrayList<SubTask> subTaskList;
+    private ArrayList<Integer> subTaskIDList;
 
-    public Epic(String taskName,
+    // Constructor
+    public Epic(String title,
                 String description) {
 
-        super(taskName, description);
-        subTaskList = new ArrayList<>();
+        super(title, description);
+        subTaskIDList = new ArrayList<>();
     }
 
-    public void addSubTask(SubTask subTask) {
-        subTaskList.add(subTask);
-        updateStatus();
+    public Epic(Epic epic) {
+        super(epic.getTitle(), epic.getDescription(), epic.getID(), epic.getStatus());
+        subTaskIDList = epic.getSubTaskIDList();
     }
 
-    public void removeSubTask(SubTask subTask) {
-        subTaskList.remove(subTask);
-        updateStatus();
+    public void addSubTaskID(Integer subTaskID) {
+        subTaskIDList.add(subTaskID);
     }
 
-    public void updateStatus() {
-        int countDoneTask = 0;
-        int countInProgressTask = 0;
-
-        for (SubTask task : subTaskList) {
-            if (task.getStatus() == IN_PROGRESS) countInProgressTask++;
-            if (task.getStatus() == DONE) countDoneTask++;
-        }
-
-        if (countDoneTask > 0 && countDoneTask == subTaskList.size() ) {
-            setStatus(DONE);
-        } else if (countInProgressTask > 0 || countDoneTask > 0) {
-            setStatus(IN_PROGRESS);
-        } else {
-            setStatus(NEW);
-        }
+    public void removeSubTaskID(Integer subTaskID) {
+        subTaskIDList.remove(subTaskID);
     }
 
-    public ArrayList<SubTask> getSubTaskList() {
-        return subTaskList;
+    public ArrayList<Integer> getSubTaskIDList() {
+        return subTaskIDList;
+    }
+
+    @Override
+    public String toString() {
+        return "E{" +
+                "Name:" + this.getTitle() + " \\ " +
+                this.getDescription() +
+                "|ID:" + this.getID() +
+                "|S:" + this.getStatus() +
+                "|ST:" + subTaskIDList +
+                "}";
     }
 }

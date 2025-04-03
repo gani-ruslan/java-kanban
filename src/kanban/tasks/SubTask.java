@@ -2,22 +2,37 @@ package kanban.tasks;
 
 public class SubTask extends Task {
 
-    // Kanban.Tasks.SubTask field: base (current edition)
-    private Epic parentTask;
+    private Integer parentTaskID;
 
-    public SubTask(String taskName,
+    public SubTask(String title,
                    String description) {
 
-        super(taskName, description);
-        this.parentTask = null;
+        super(title, description);
+        parentTaskID = 0;
+    }
+
+    public SubTask(SubTask subTask) {
+        super(subTask.getTitle(), subTask.getDescription(), subTask.getID(), subTask.getStatus());
+        parentTaskID = subTask.getParentTaskID();
     }
 
     // Setters and getters
-    public Epic getParentTask() {
-        return parentTask;
+    public Integer getParentTaskID() {
+        return parentTaskID;
     }
 
-    public void setParentTask(Epic parentTask) {
-        this.parentTask = parentTask;
+    public void setParentTaskID(Integer parentTaskID) {
+        this.parentTaskID = parentTaskID;
+    }
+
+    @Override
+    public String toString() {
+        return "SB{" +
+                "Name:" + this.getTitle() + " \\ " +
+                this.getDescription() +
+                "|ID:" + this.getID() +
+                "|S:" + this.getStatus() +
+                "|ET:" + parentTaskID +
+                "}";
     }
 }

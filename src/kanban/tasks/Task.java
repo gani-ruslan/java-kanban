@@ -5,49 +5,66 @@ import static kanban.tasks.TaskStatus.*;
 
 public class Task {
 
-    protected static Integer globalIDCounter = 1;
-
-    private final Integer taskID;
-    private String taskName;
+    private Integer id;
+    private String title;
     private String description;
-    private TaskStatus taskStatus;
+    private TaskStatus status;
 
-    // Constructor
-    public Task(String taskName,
+    public Task(String title,
                 String description) {
-        this.taskName = taskName;
+        this.title = title;
         this.description = description;
-        taskID = globalIDCounter++;
-        taskStatus = NEW;
+        id = 0;
+        status = NEW;
     }
 
-    // Setters and getters
-    public String getName() {
-        return taskName;
+    public Task(String title,
+                String description,
+                Integer id,
+                TaskStatus status) {
+        this.title = title;
+        this.description = description;
+        this.id = id;
+        this.status = status;
     }
 
-    public void setName(String taskName) {
-        this.taskName = taskName;
+    public Task(Task task) {
+        title = task.getTitle();
+        description = task.getDescription();
+        id = task.getID();
+        status = task.getStatus();
     }
 
-    public String getDescription() {
-        return description;
+    public void setID(Integer taskID) {
+        this.id = taskID;
+    }
+
+    public Integer getID() {
+        return id;
+    }
+
+    public void setTitle(String taskName) {
+        this.title = taskName;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public void setDescription(String description) {
         this.description = description;
     }
 
-    public Integer getID() {
-        return taskID;
-    }
-
-    public TaskStatus getStatus() {
-        return taskStatus;
+    public String getDescription() {
+        return description;
     }
 
     public void setStatus(TaskStatus taskStatus) {
-        this.taskStatus = taskStatus;
+        this.status = taskStatus;
+    }
+
+    public TaskStatus getStatus() {
+        return status;
     }
 
     @Override
@@ -55,11 +72,21 @@ public class Task {
         if (this == taskObject) return true;
         if (taskObject == null || getClass() != taskObject.getClass()) return false;
         Task task = (Task) taskObject;
-        return taskID.equals(task.taskID);
+        return id.equals(task.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(taskID);
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "T{" +
+                "Name:" + title + " \\ " +
+                description +
+                "|id:" + id +
+                "|S:" + status +
+                "}";
     }
 }
