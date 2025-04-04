@@ -29,17 +29,6 @@ class InMemoryTaskManagerTest {
         subB = new SubTask("Title sub B", "Sub description B");
     }
 
-    @Test
-    void givenEpic_whenSettingItAsItsOwnSubtask_thenThrowException() {
-        manager.addEpic(epicA);
-        assertThrows(IllegalArgumentException.class, () -> manager.addSubToEpic(epicA.getID(), epicA.getID()));
-    }
-
-    @Test
-    void givenSubtask_whenSettingItAsItsOwnEpic_thenThrowException() {
-        manager.addSub(subA);
-        assertThrows(IllegalArgumentException.class, () -> manager.addSubToEpic(subA.getID(), subA.getID()));
-    }
 
     @Test
     void givenInMemoryTaskManager_whenAddingTasksOfDifferentTypes_thenTasksAddedAndFoundById() {
@@ -81,10 +70,13 @@ class InMemoryTaskManagerTest {
         manager.addEpic(epicA);
         manager.addSub(subA);
         manager.addSub(subB);
-        manager.addSubToEpic(subA.getID(), epicA.getID());
-        manager.addSubToEpic(subB.getID(), epicA.getID());
+        manager.getEpicByID(epicA.getID()).addSubID(subA.getID());
+        manager.getEpicByID(epicA.getID()).addSubID(subB.getID());
+        manager.getSubTaskByID(subA.getID()).setParentID(epicA.getID());
+        manager.getSubTaskByID(subB.getID()).setParentID(epicA.getID());
+        manager.updateEpic(manager.getEpicByID(epicA.getID()));
         manager.getSubTaskByID(subB.getID()).setStatus(TaskStatus.IN_PROGRESS);
-        manager.updateStatus(epicA.getID());
+        manager.updateEpic(manager.getEpicByID(epicA.getID()));
         assertEquals(TaskStatus.IN_PROGRESS, manager.getEpicByID(epicA.getID()).getStatus());
     }
 
@@ -93,11 +85,14 @@ class InMemoryTaskManagerTest {
         manager.addEpic(epicA);
         manager.addSub(subA);
         manager.addSub(subB);
-        manager.addSubToEpic(subA.getID(), epicA.getID());
-        manager.addSubToEpic(subB.getID(), epicA.getID());
+        manager.getEpicByID(epicA.getID()).addSubID(subA.getID());
+        manager.getEpicByID(epicA.getID()).addSubID(subB.getID());
+        manager.getSubTaskByID(subA.getID()).setParentID(epicA.getID());
+        manager.getSubTaskByID(subB.getID()).setParentID(epicA.getID());
+        manager.updateEpic(manager.getEpicByID(epicA.getID()));
         manager.getSubTaskByID(subA.getID()).setStatus(TaskStatus.DONE);
         manager.getSubTaskByID(subB.getID()).setStatus(TaskStatus.DONE);
-        manager.updateStatus(epicA.getID());
+        manager.updateEpic(manager.getEpicByID(epicA.getID()));
         assertEquals(TaskStatus.DONE, manager.getEpicByID(epicA.getID()).getStatus());
     }
 
@@ -106,11 +101,14 @@ class InMemoryTaskManagerTest {
         manager.addEpic(epicA);
         manager.addSub(subA);
         manager.addSub(subB);
-        manager.addSubToEpic(subA.getID(), epicA.getID());
-        manager.addSubToEpic(subB.getID(), epicA.getID());
+        manager.getEpicByID(epicA.getID()).addSubID(subA.getID());
+        manager.getEpicByID(epicA.getID()).addSubID(subB.getID());
+        manager.getSubTaskByID(subA.getID()).setParentID(epicA.getID());
+        manager.getSubTaskByID(subB.getID()).setParentID(epicA.getID());
+        manager.updateEpic(manager.getEpicByID(epicA.getID()));
         manager.getSubTaskByID(subA.getID()).setStatus(TaskStatus.IN_PROGRESS);
         manager.getSubTaskByID(subB.getID()).setStatus(TaskStatus.DONE);
-        manager.updateStatus(epicA.getID());
+        manager.updateEpic(manager.getEpicByID(epicA.getID()));
         assertEquals(TaskStatus.IN_PROGRESS, manager.getEpicByID(epicA.getID()).getStatus());
     }
 
@@ -119,7 +117,9 @@ class InMemoryTaskManagerTest {
         manager.addEpic(epicA);
         subA.setStatus(TaskStatus.DONE);
         manager.addSub(subA);
-        manager.addSubToEpic(subA.getID(), epicA.getID());
+        manager.getEpicByID(epicA.getID()).addSubID(subA.getID());
+        manager.getSubTaskByID(subA.getID()).setParentID(epicA.getID());
+        manager.updateEpic(manager.getEpicByID(epicA.getID()));
         assertEquals(TaskStatus.DONE, manager.getEpicByID(epicA.getID()).getStatus());
         assertFalse(manager.getEpicSubTaskList(epicA.getID()).isEmpty());
         manager.removeSubByID(subA.getID());
@@ -131,7 +131,8 @@ class InMemoryTaskManagerTest {
     void givenEpicTaskWithSub_whenRemovingEpicTask_thenEpicTaskWithSubRemoved() {
         manager.addEpic(epicA);
         manager.addSub(subA);
-        manager.addSubToEpic(subA.getID(), epicA.getID());
+        manager.getEpicByID(epicA.getID()).addSubID(subA.getID());
+        manager.getSubTaskByID(subA.getID()).setParentID(epicA.getID());
         assertFalse(manager.getEpicList().isEmpty());
         assertFalse(manager.getSubList().isEmpty());
         manager.removeEpicByID(epicA.getID());
@@ -185,13 +186,15 @@ class InMemoryTaskManagerTest {
         manager.addEpic(epicA);
         manager.addSub(subA);
         manager.getSubTaskByID(subA.getID()).setStatus(TaskStatus.IN_PROGRESS);
-        manager.addSubToEpic(subA.getID(), epicA.getID());
+        manager.getEpicByID(epicA.getID()).addSubID(subA.getID());
+        manager.getSubTaskByID(subA.getID()).setParentID(epicA.getID());
+        manager.updateEpic(manager.getEpicByID(epicA.getID()));
         assertEquals(TaskStatus.IN_PROGRESS, manager.getEpicByID(epicA.getID()).getStatus());
 
         subB.setStatus(TaskStatus.DONE);
         manager.addSub(subB);
         epicB.setID(epicA.getID());
-        epicB.addSubTaskID(subB.getID());
+        epicB.addSubID(subB.getID());
         manager.updateEpic(epicB);
         assertEquals(TaskStatus.DONE, manager.getEpicByID(epicA.getID()).getStatus());
     }
@@ -201,11 +204,13 @@ class InMemoryTaskManagerTest {
         manager.addEpic(epicA);
         manager.addSub(subA);
         manager.getSubTaskByID(subA.getID()).setStatus(TaskStatus.IN_PROGRESS);
-        manager.addSubToEpic(subA.getID(), epicA.getID());
+        manager.getEpicByID(epicA.getID()).addSubID(subA.getID());
+        manager.getSubTaskByID(subA.getID()).setParentID(epicA.getID());
+        manager.updateEpic(manager.getEpicByID(epicA.getID()));
         assertEquals(TaskStatus.IN_PROGRESS, manager.getEpicByID(epicA.getID()).getStatus());
 
         subB.setID(subA.getID());
-        subB.setParentTaskID(epicA.getID());
+        subB.setParentID(epicA.getID());
         subB.setStatus(TaskStatus.DONE);
         manager.updateSub(subB);
         assertEquals(TaskStatus.DONE, manager.getEpicByID(epicA.getID()).getStatus());

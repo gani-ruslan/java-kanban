@@ -16,18 +16,35 @@ public class Epic extends Task {
 
     public Epic(Epic epic) {
         super(epic.getTitle(), epic.getDescription(), epic.getID(), epic.getStatus());
-        subTaskIDList = epic.getSubTaskIDList();
+        subTaskIDList = epic.getSubIDList();
     }
 
-    public void addSubTaskID(Integer subTaskID) {
-        subTaskIDList.add(subTaskID);
+    public void addSubID(Integer subID) {
+        if (subID == null) {
+            throw new IllegalArgumentException("Subtask ID cannot be null.");
+        }
+        if (subID.equals(this.getID())) {
+            throw new IllegalArgumentException("Invalid operation: " +
+                    "a subtask cannot have the same ID as its epic. ID: " + subID);
+        }
+        if (subTaskIDList.contains(subID)) {
+            return;
+        }
+        subTaskIDList.add(subID);
     }
 
-    public void removeSubTaskID(Integer subTaskID) {
-        subTaskIDList.remove(subTaskID);
+    public void removeSubID(Integer subID) {
+        if (subID == null) {
+            throw new IllegalArgumentException("Subtask ID cannot be null.");
+        }
+        if (subID.equals(this.getID())) {
+            throw new IllegalArgumentException("Invalid operation: " +
+                    "a subtask cannot have the same ID as its epic. ID: " + subID);
+        }
+        subTaskIDList.remove(subID);
     }
 
-    public ArrayList<Integer> getSubTaskIDList() {
+    public ArrayList<Integer> getSubIDList() {
         return subTaskIDList;
     }
 

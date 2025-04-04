@@ -44,7 +44,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public ArrayList<SubTask> getEpicSubTaskList(Integer epicID) {
         ArrayList<SubTask> subTaskList = new ArrayList<>();
-        for (Integer subTaskID : epicStorageMap.get(epicID).getSubTaskIDList()) {
+        for (Integer subTaskID : epicStorageMap.get(epicID).getSubIDList()) {
             subTaskList.add(subStorageMap.get(subTaskID));
         }
         return subTaskList;
@@ -94,32 +94,6 @@ public class InMemoryTaskManager implements TaskManager {
         subStorageMap.put(newSub.getID(), new SubTask(newSub));
     }
 
-    @Override
-    public void addSubToEpic(Integer subID, Integer epicID) {
-        if (subID == null) {
-            throw new IllegalArgumentException("Subtask ID cannot be null.");
-        }
-        if (epicID == null) {
-            throw new IllegalArgumentException("Epic ID cannot be null.");
-        }
-        if (subID.equals(epicID)) {
-            throw new IllegalArgumentException("Invalid operation: a subtask cannot have the same ID as its epic. ID: " + subID);
-        }
-        if (!subStorageMap.containsKey(subID)) {
-            throw new IllegalArgumentException("Invalid subtask ID: " + subID + ". No such subtask found.");
-        }
-        if (!epicStorageMap.containsKey(epicID)) {
-            throw new IllegalArgumentException("Invalid epic ID: " + epicID + ". No such epic found.");
-        }
-        subStorageMap.get(subID).setParentTaskID(epicID);
-        epicStorageMap.get(epicID).addSubTaskID(subID);
-        updateStatus(epicID);
-    }
-
-    private Integer generateID() {
-        return globalIDCounter++;
-    }
-
 
     // Update different task type by ID
     @Override
@@ -136,44 +110,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateSub(SubTask updateSub) {
         subStorageMap.put(updateSub.getID(), new SubTask(updateSub));
-        updateStatus(updateSub.getParentTaskID());
-    }
-
-    @Override
-    public void updateStatus(Integer epicID) {
-        int countDoneTask = 0;
-        int countInProgressTask = 0;
-
-        // ID not a epicTaskID / EpicID is null / EpicID not found.
-        if (epicID == null) {
-            throw new IllegalArgumentException("EpicID cannot be null.");
-        }
-
-        if (!epicStorageMap.containsKey(epicID)) {
-            throw new IllegalArgumentException("Invalid argument: the provided ID (" + epicID + ") is not associated with an Epic task.");
-        }
-
-        // if epicTask without subTask
-        if (epicStorageMap.get(epicID).getSubTaskIDList().isEmpty()) {
-            epicStorageMap.get(epicID).setStatus(NEW);
-            return;
-        }
-
-        // if epicTask has some subTask
-        for (Integer subID : epicStorageMap.get(epicID).getSubTaskIDList()) {
-            if (subStorageMap.containsKey(subID)) {
-                if (subStorageMap.get(subID).getStatus() == IN_PROGRESS) countInProgressTask++;
-                if (subStorageMap.get(subID).getStatus() == DONE) countDoneTask++;
-            }
-        }
-
-        if (countDoneTask == epicStorageMap.get(epicID).getSubTaskIDList().size() ) {
-            epicStorageMap.get(epicID).setStatus(DONE);
-        } else if (countInProgressTask > 0) {
-            epicStorageMap.get(epicID).setStatus(IN_PROGRESS);
-        } else {
-            epicStorageMap.get(epicID).setStatus(NEW);
-        }
+        updateStatus(updateSub.getParentID());
     }
 
 
@@ -185,14 +122,14 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeEpicByID(Integer epicID) {
-        for (Integer subID : epicStorageMap.get(epicID).getSubTaskIDList()) subStorageMap.remove(subID);
+        for (Integer subID : epicStorageMap.get(epicID).getSubIDList()) subStorageMap.remove(subID);
         epicStorageMap.remove(epicID);
     }
 
     @Override
     public void removeSubByID(Integer subID) {
-        epicStorageMap.get(subStorageMap.get(subID).getParentTaskID()).removeSubTaskID(subID);
-        updateStatus(subStorageMap.get(subID).getParentTaskID());
+        epicStorageMap.get(subStorageMap.get(subID).getParentID()).removeSubID(subID);
+        updateStatus(subStorageMap.get(subID).getParentID());
         subStorageMap.remove(subID);
     }
 
@@ -212,12 +149,54 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeAllSub() {
         for(SubTask subTask : subStorageMap.values()) {
-            epicStorageMap.get(subTask.getParentTaskID()).removeSubTaskID(subTask.getID());
+            epicStorageMap.get(subTask.getParentID()).removeSubID(subTask.getID());
         }
         for (Epic epicTask : epicStorageMap.values()) {
             updateStatus(epicTask.getID());
         }
         subStorageMap.clear();
+    }
+
+
+    // Private methods
+    private Integer generateID() {
+        return globalIDCounter++;
+    }
+
+    private void updateStatus(Integer epicID) {
+        int countDoneTask = 0;
+        int countInProgressTask = 0;
+
+        // ID not a epicTaskID / EpicID is null / EpicID not found.
+        if (epicID == null) {
+            throw new IllegalArgumentException("EpicID cannot be null.");
+        }
+
+        if (!epicStorageMap.containsKey(epicID)) {
+            throw new IllegalArgumentException("Invalid argument: the provided ID (" + epicID + ") is not associated with an Epic task.");
+        }
+
+        // if epicTask without subTask
+        if (epicStorageMap.get(epicID).getSubIDList().isEmpty()) {
+            epicStorageMap.get(epicID).setStatus(NEW);
+            return;
+        }
+
+        // if epicTask has some subTask
+        for (Integer subID : epicStorageMap.get(epicID).getSubIDList()) {
+            if (subStorageMap.containsKey(subID)) {
+                if (subStorageMap.get(subID).getStatus() == IN_PROGRESS) countInProgressTask++;
+                if (subStorageMap.get(subID).getStatus() == DONE) countDoneTask++;
+            }
+        }
+
+        if (countDoneTask == epicStorageMap.get(epicID).getSubIDList().size() ) {
+            epicStorageMap.get(epicID).setStatus(DONE);
+        } else if (countInProgressTask > 0) {
+            epicStorageMap.get(epicID).setStatus(IN_PROGRESS);
+        } else {
+            epicStorageMap.get(epicID).setStatus(NEW);
+        }
     }
 }
 

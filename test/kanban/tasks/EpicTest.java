@@ -18,23 +18,32 @@ class EpicTest {
         epicB = new Epic("Epic title B", "Epic description B");
         subA = new SubTask("Sub title A", "Sub description A");
         subB = new SubTask("Sub title B", "Sub description B");
-        epicA.addSubTaskID(subA.getID());
-        epicA.addSubTaskID(subB.getID());
-        epicB.addSubTaskID(subA.getID());
-        epicB.addSubTaskID(subB.getID());
+        epicA.setID(1);
+        epicB.setID(2);
+        subA.setID(3);
+        subB.setID(4);
+        epicA.addSubID(subA.getID());
+        epicA.addSubID(subB.getID());
+        epicB.addSubID(subA.getID());
+        epicB.addSubID(subB.getID());
         subA.setStatus(TaskStatus.NEW);
         subB.setStatus(TaskStatus.NEW);
     }
 
     @Test
+    void givenEpicTask_whenSettingItAsItsOwnSubtask_thenThrowException() {
+        assertThrows(IllegalArgumentException.class, () -> epicA.addSubID(epicA.getID()));
+    }
+
+    @Test
     void givenEpicTask_whenNeedAddSubTask_thenEpicSubTaskListNotNull() {
-        System.out.println(epicA.getSubTaskIDList());
-        assertEquals(2, epicA.getSubTaskIDList().size());
+        System.out.println(epicA.getSubIDList());
+        assertEquals(2, epicA.getSubIDList().size());
     }
 
     @Test
     void givenEpicTask_whenNeedAddSubTask_thenEpicsSubTaskHasSameID() {
-        ArrayList<Integer> subTasksList = new ArrayList<>(epicA.getSubTaskIDList());
+        ArrayList<Integer> subTasksList = new ArrayList<>(epicA.getSubIDList());
         assertEquals(subA.getID(), subTasksList.get(0));
         assertEquals(subB.getID(), subTasksList.get(1));
     }

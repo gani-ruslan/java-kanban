@@ -18,10 +18,15 @@ class SubTaskTest {
     }
 
     @Test
+    void givenSubtask_whenSettingItAsItsOwnEpic_thenThrowException() {
+        assertThrows(IllegalArgumentException.class, () -> subA.setParentID(subA.getID()));
+    }
+
+    @Test
     void givenSubTask_whenSetSubParentTaskAsEpic_thenSubParentTaskNotNullandEqualEpicID() {
-        subA.setParentTaskID(epicA.getID());
-        assertNotNull(subA.getParentTaskID());
-        assertEquals(subA.getParentTaskID(), epicA.getID());
+        subA.setParentID(epicA.getID());
+        assertNotNull(subA.getParentID());
+        assertEquals(subA.getParentID(), epicA.getID());
     }
 
     @Test

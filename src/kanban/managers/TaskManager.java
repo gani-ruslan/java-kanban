@@ -21,13 +21,11 @@ public interface TaskManager {
     void addTask(Task newTask);
     void addEpic(Epic newEpic);
     void addSub(SubTask newSub);
-    void addSubToEpic(Integer subID, Integer epicID);
 
     // Update task by ID
     void updateTask(Task updateTask);
     void updateEpic(Epic updateEpic);
     void updateSub(SubTask updateSubs);
-    void updateStatus(Integer epicID);
 
     // Remove task (task/epic/sub)
     void removeTaskByID(Integer taskID);

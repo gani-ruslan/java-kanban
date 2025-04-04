@@ -2,27 +2,34 @@ package kanban.tasks;
 
 public class SubTask extends Task {
 
-    private Integer parentTaskID;
+    private Integer parentID;
 
     public SubTask(String title,
                    String description) {
 
         super(title, description);
-        parentTaskID = 0;
+        parentID = null;
     }
 
     public SubTask(SubTask subTask) {
         super(subTask.getTitle(), subTask.getDescription(), subTask.getID(), subTask.getStatus());
-        parentTaskID = subTask.getParentTaskID();
+        parentID = subTask.getParentID();
     }
 
     // Setters and getters
-    public Integer getParentTaskID() {
-        return parentTaskID;
+    public Integer getParentID() {
+        return parentID;
     }
 
-    public void setParentTaskID(Integer parentTaskID) {
-        this.parentTaskID = parentTaskID;
+    public void setParentID(Integer parentID) {
+        if (parentID.equals(this.getID())) {
+            throw new IllegalArgumentException("Invalid operation: " +
+                    "a parent(epic) cannot have the same ID as its subtask. ID: " + parentID);
+        }
+        if (parentID.equals(this.getParentID())) {
+            return;
+        }
+        this.parentID = parentID;
     }
 
     @Override
@@ -32,7 +39,7 @@ public class SubTask extends Task {
                 this.getDescription() +
                 "|ID:" + this.getID() +
                 "|S:" + this.getStatus() +
-                "|ET:" + parentTaskID +
+                "|ET:" + parentID +
                 "}";
     }
 }

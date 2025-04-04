@@ -1,4 +1,3 @@
-import kanban.managers.InMemoryTaskManager;
 import kanban.managers.Managers;
 import kanban.managers.TaskManager;
 import kanban.tasks.*;
@@ -24,9 +23,14 @@ public class Main {
         manager.addSub(subB);
         manager.addSub(subC);
 
-        manager.addSubToEpic(subA.getID(), epicA.getID());
-        manager.addSubToEpic(subB.getID(), epicA.getID());
-        manager.addSubToEpic(subC.getID(), epicB.getID());
+        manager.getEpicByID(epicA.getID()).addSubID(subA.getID());
+        manager.getEpicByID(epicA.getID()).addSubID(subB.getID());
+        manager.getEpicByID(epicB.getID()).addSubID(subC.getID());
+        manager.getSubTaskByID(subA.getID()).setParentID(epicA.getID());
+        manager.getSubTaskByID(subB.getID()).setParentID(epicA.getID());
+        manager.getSubTaskByID(subC.getID()).setParentID(epicB.getID());
+        manager.updateEpic(manager.getEpicByID(epicA.getID()));
+        manager.updateEpic(manager.getEpicByID(epicB.getID()));
 
         System.out.println("Pass 1: Init.");
         for (Task task : manager.getTaskList()) System.out.println(task);
@@ -35,9 +39,9 @@ public class Main {
 
         manager.getTaskByID(taskA.getID()).setStatus(TaskStatus.IN_PROGRESS);
         manager.getSubTaskByID(subA.getID()).setStatus(TaskStatus.IN_PROGRESS);
-        manager.updateStatus(epicA.getID());
+        manager.updateEpic(manager.getEpicByID(epicA.getID()));
         manager.getSubTaskByID(subC.getID()).setStatus(TaskStatus.DONE);
-        manager.updateStatus(epicB.getID());
+        manager.updateEpic(manager.getEpicByID(epicB.getID()));
 
         System.out.println("\nPass 2: Change status");
         for (Task task : manager.getTaskList()) System.out.println(task);

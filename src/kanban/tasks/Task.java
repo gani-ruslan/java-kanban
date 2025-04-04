@@ -35,8 +35,8 @@ public class Task {
         status = task.getStatus();
     }
 
-    public void setID(Integer taskID) {
-        this.id = taskID;
+    public void setID(Integer ID) {
+        this.id = ID;
     }
 
     public Integer getID() {
