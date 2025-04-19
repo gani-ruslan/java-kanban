@@ -21,15 +21,14 @@ public class SubTask extends Task {
         return parentID;
     }
 
-    public void setParentID(Integer parentID) {
-        if (parentID.equals(this.getID())) {
-            throw new IllegalArgumentException("Invalid operation: " +
-                    "a parent(epic) cannot have the same ID as its subtask. ID: " + parentID);
+    public void setParentID(Integer epicID) {
+        if (epicID.equals(this.getID())) {
+            throw new IllegalArgumentException("epicID cannot have the same ID as its subtask.");
         }
-        if (parentID.equals(this.getParentID())) {
+        if (epicID.equals(this.getParentID())) {
             return;
         }
-        this.parentID = parentID;
+        this.parentID = epicID;
     }
 
     @Override

@@ -12,9 +12,9 @@ class SubTaskTest {
 
     @BeforeAll
     static void beforeAllTests() {
-        subA = new SubTask("Task title A", "Task Description A");
-        subB = new SubTask("Task title B", "Task Description B");
-        epicA = new Epic("Epic task title", "Epic task description");
+        subA = new SubTask("Sub A", "Description A");
+        subB = new SubTask("Sub B", "Description B");
+        epicA = new Epic("Epic A", "Description C");
     }
 
     @Test

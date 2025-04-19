@@ -35,8 +35,8 @@ public class Task {
         status = task.getStatus();
     }
 
-    public void setID(Integer ID) {
-        this.id = ID;
+    public void setID(Integer id) {
+        this.id = id;
     }
 
     public Integer getID() {
@@ -70,8 +70,7 @@ public class Task {
     @Override
     public boolean equals(Object taskObject) {
         if (this == taskObject) return true;
-        if (taskObject == null || getClass() != taskObject.getClass()) return false;
-        Task task = (Task) taskObject;
+        if (!(taskObject instanceof Task task)) return false;
         return id.equals(task.id);
     }
 

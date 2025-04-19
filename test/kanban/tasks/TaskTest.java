@@ -12,8 +12,8 @@ class TaskTest {
 
     @BeforeAll
     static void beforeAllTest() {
-        TaskA = new Task("Task title A", "Task description A");
-        TaskB = new Task("Task title B", "Task description B");
+        TaskA = new Task("Task A", "Description A");
+        TaskB = new Task("Task B", "Description B");
     }
 
     @BeforeEach
@@ -31,14 +31,14 @@ class TaskTest {
 
     @Test
     void givenName_whenSetNewName_thenChangeName() {
-        TaskA.setTitle("Task title A modified");
-        assertEquals("Task title A modified", TaskA.getTitle());
+        TaskA.setTitle("Task A modified");
+        assertEquals("Task A modified", TaskA.getTitle());
     }
 
     @Test
     void givenDescription_whenSetNewDescription_thenChangeDescription() {
-        TaskA.setDescription("Task description A modified");
-        assertEquals("Task description A modified", TaskA.getDescription());
+        TaskA.setDescription("Description A modified");
+        assertEquals("Description A modified", TaskA.getDescription());
     }
 
     @Test
