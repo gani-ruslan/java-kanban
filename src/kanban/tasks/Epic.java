@@ -1,10 +1,11 @@
 package kanban.tasks;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Epic extends Task {
 
-    private ArrayList<Integer> subTaskIDList;
+    private final List<Integer> subTaskIDList;
 
     // Constructor
     public Epic(String title,
@@ -21,11 +22,10 @@ public class Epic extends Task {
 
     public void addSubID(Integer subID) {
         if (subID == null) {
-            throw new IllegalArgumentException("Subtask ID cannot be null.");
+            throw new IllegalArgumentException("subID must not be null.");
         }
         if (subID.equals(this.getID())) {
-            throw new IllegalArgumentException("Invalid operation: " +
-                    "a subtask cannot have the same ID as its epic. ID: " + subID);
+            throw new IllegalArgumentException("subID cannot have the same ID as its epic.");
         }
         if (subTaskIDList.contains(subID)) {
             return;
@@ -35,16 +35,15 @@ public class Epic extends Task {
 
     public void removeSubID(Integer subID) {
         if (subID == null) {
-            throw new IllegalArgumentException("Subtask ID cannot be null.");
+            throw new IllegalArgumentException("subID must not be null.");
         }
         if (subID.equals(this.getID())) {
-            throw new IllegalArgumentException("Invalid operation: " +
-                    "a subtask cannot have the same ID as its epic. ID: " + subID);
+            throw new IllegalArgumentException("subID cannot have the same ID as its epic.");
         }
         subTaskIDList.remove(subID);
     }
 
-    public ArrayList<Integer> getSubIDList() {
+    public List<Integer> getSubIDList() {
         return subTaskIDList;
     }
 

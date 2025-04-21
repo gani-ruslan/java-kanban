@@ -16,6 +16,6 @@ public class ManagersTest {
     void givenHistoryManager_whenInitialized_thenReturnsInitializedInstance() {
         HistoryManager manager = Managers.getDefaultHistory();
         assertNotNull(manager);
-        assertTrue(manager.getHistory().isEmpty());
+        assertTrue(manager.getTasks().isEmpty());
     }
 }

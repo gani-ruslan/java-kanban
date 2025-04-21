@@ -14,10 +14,10 @@ class EpicTest {
 
     @BeforeEach
     void beforeEachTest() {
-        epicA = new Epic("Epic title A", "Epic description A");
-        epicB = new Epic("Epic title B", "Epic description B");
-        subA = new SubTask("Sub title A", "Sub description A");
-        subB = new SubTask("Sub title B", "Sub description B");
+        epicA = new Epic("Epic A", "Description A");
+        epicB = new Epic("Epic B", "Description B");
+        subA = new SubTask("Sub A", "Description C");
+        subB = new SubTask("Sub B", "Description D");
         epicA.setID(1);
         epicB.setID(2);
         subA.setID(3);
@@ -37,7 +37,6 @@ class EpicTest {
 
     @Test
     void givenEpicTask_whenNeedAddSubTask_thenEpicSubTaskListNotNull() {
-        System.out.println(epicA.getSubIDList());
         assertEquals(2, epicA.getSubIDList().size());
     }
 
