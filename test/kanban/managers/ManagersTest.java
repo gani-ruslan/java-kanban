@@ -1,10 +1,11 @@
 package kanban.managers;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 public class ManagersTest {
-
     @Test
     void givenManager_whenInitialized_thenReturnsInitializedInstance() {
         TaskManager manager = Managers.getDefault();

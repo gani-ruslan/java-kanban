@@ -1,10 +1,12 @@
 package kanban.tasks;
 
+import static kanban.tasks.TaskStatus.NEW;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import java.util.ArrayList;
-import static org.junit.jupiter.api.Assertions.*;
-
 
 class EpicTest {
     private Epic epicA;
@@ -18,39 +20,39 @@ class EpicTest {
         epicB = new Epic("Epic B", "Description B");
         subA = new SubTask("Sub A", "Description C");
         subB = new SubTask("Sub B", "Description D");
-        epicA.setID(1);
-        epicB.setID(2);
-        subA.setID(3);
-        subB.setID(4);
-        epicA.addSubID(subA.getID());
-        epicA.addSubID(subB.getID());
-        epicB.addSubID(subA.getID());
-        epicB.addSubID(subB.getID());
-        subA.setStatus(TaskStatus.NEW);
-        subB.setStatus(TaskStatus.NEW);
+        epicA.setId(1);
+        epicB.setId(2);
+        subA.setId(3);
+        subB.setId(4);
+        epicA.addSubId(subA.getId());
+        epicA.addSubId(subB.getId());
+        epicB.addSubId(subA.getId());
+        epicB.addSubId(subB.getId());
+        subA.setStatus(NEW);
+        subB.setStatus(NEW);
     }
 
     @Test
     void givenEpicTask_whenSettingItAsItsOwnSubtask_thenThrowException() {
-        assertThrows(IllegalArgumentException.class, () -> epicA.addSubID(epicA.getID()));
+        assertThrows(IllegalArgumentException.class, () -> epicA.addSubId(epicA.getId()));
     }
 
     @Test
     void givenEpicTask_whenNeedAddSubTask_thenEpicSubTaskListNotNull() {
-        assertEquals(2, epicA.getSubIDList().size());
+        assertEquals(2, epicA.getSubIdList().size());
     }
 
     @Test
-    void givenEpicTask_whenNeedAddSubTask_thenEpicsSubTaskHasSameID() {
-        ArrayList<Integer> subTasksList = new ArrayList<>(epicA.getSubIDList());
-        assertEquals(subA.getID(), subTasksList.get(0));
-        assertEquals(subB.getID(), subTasksList.get(1));
+    void givenEpicTask_whenNeedAddSubTask_thenEpicsSubTaskHasSameId() {
+        ArrayList<Integer> subTasksList = new ArrayList<>(epicA.getSubIdList());
+        assertEquals(subA.getId(), subTasksList.get(0));
+        assertEquals(subB.getId(), subTasksList.get(1));
     }
 
     @Test
-    void givenTwoEpicWithSameID_whenIDEquals_thenEpicEquals() {
-        epicA.setID(1);
-        epicB.setID(1);
+    void givenTwoEpicWithSameId_whenIdEquals_thenEpicEquals() {
+        epicA.setId(1);
+        epicB.setId(1);
         assertEquals(epicA, epicB);
     }
 }

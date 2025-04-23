@@ -1,9 +1,12 @@
 package kanban.tasks;
 
+import static kanban.tasks.TaskStatus.IN_PROGRESS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+
 
 class TaskTest {
 
@@ -18,14 +21,14 @@ class TaskTest {
 
     @BeforeEach
     void beforeEachTest() {
-        TaskA.setID(1);
-        TaskB.setID(2);
+        TaskA.setId(1);
+        TaskB.setId(2);
     }
 
     @Test
-    void givenTwoTaskWithSameID_whenIDEquals_thenTaskEquals() {
-        TaskA.setID(1);
-        TaskB.setID(1);
+    void givenTwoTaskWithSameId_whenIdEquals_thenTaskEquals() {
+        TaskA.setId(1);
+        TaskB.setId(1);
         assertEquals(TaskA, TaskB);
     }
 
@@ -43,7 +46,7 @@ class TaskTest {
 
     @Test
     void givenStatus_whenSetNewStatus_thenChangeStatus() {
-        TaskA.setStatus(TaskStatus.IN_PROGRESS);
-        assertEquals(TaskStatus.IN_PROGRESS, TaskA.getStatus());
+        TaskA.setStatus(IN_PROGRESS);
+        assertEquals(IN_PROGRESS, TaskA.getStatus());
     }
 }

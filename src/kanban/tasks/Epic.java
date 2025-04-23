@@ -3,58 +3,97 @@ package kanban.tasks;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents an Epic task, which can contain multiple subtasks.
+ * Inherits all fields from {@link Task} and adds a list of subtask IDs.
+ */
 public class Epic extends Task {
 
-    private final List<Integer> subTaskIDList;
+    private final List<Integer> subTaskIdList;
 
-    // Constructor
+    /**
+     * Constructor for creating a new Epic with an empty list of subtasks.
+     *
+     * @param title       the epic title
+     * @param description the epic description
+     */
     public Epic(String title,
                 String description) {
 
         super(title, description);
-        subTaskIDList = new ArrayList<>();
+        subTaskIdList = new ArrayList<>();
     }
 
+    /**
+     * Copy constructor for Epic.
+     *
+     * @param epic the epic to copy from
+     */
     public Epic(Epic epic) {
-        super(epic.getTitle(), epic.getDescription(), epic.getID(), epic.getStatus());
-        subTaskIDList = epic.getSubIDList();
+        super(epic.getTitle(), epic.getDescription(), epic.getId(), epic.getStatus());
+        subTaskIdList = epic.getSubIdList();
     }
 
-    public void addSubID(Integer subID) {
-        if (subID == null) {
-            throw new IllegalArgumentException("subID must not be null.");
+    /**
+     * Adds a subtask ID to the epic.
+     * Subtask ID must not be null, must not match the epic's own ID,
+     * and must not already be present in the list.
+     *
+     * @param subId the ID of the subtask to add
+     * @throws IllegalArgumentException if subId is null or equal to the epic's own ID
+     */
+    public void addSubId(Integer subId) {
+        if (subId == null) {
+            throw new IllegalArgumentException("subId must not be null.");
         }
-        if (subID.equals(this.getID())) {
-            throw new IllegalArgumentException("subID cannot have the same ID as its epic.");
+        if (subId.equals(this.getId())) {
+            throw new IllegalArgumentException("subId cannot have the same Id as its epic.");
         }
-        if (subTaskIDList.contains(subID)) {
+        if (subTaskIdList.contains(subId)) {
             return;
         }
-        subTaskIDList.add(subID);
+        subTaskIdList.add(subId);
     }
 
-    public void removeSubID(Integer subID) {
-        if (subID == null) {
-            throw new IllegalArgumentException("subID must not be null.");
+    /**
+     * Removes a subtask ID from the epic.
+     * Subtask ID must not be null and must not match the epic's own ID.
+     *
+     * @param subId the ID of the subtask to remove
+     * @throws IllegalArgumentException if subId is null or equal to the epic's own ID
+     */
+    public void removeSubId(Integer subId) {
+        if (subId == null) {
+            throw new IllegalArgumentException("subId must not be null.");
         }
-        if (subID.equals(this.getID())) {
-            throw new IllegalArgumentException("subID cannot have the same ID as its epic.");
+        if (subId.equals(this.getId())) {
+            throw new IllegalArgumentException("subId cannot have the same Id as its epic.");
         }
-        subTaskIDList.remove(subID);
+        subTaskIdList.remove(subId);
     }
 
-    public List<Integer> getSubIDList() {
-        return subTaskIDList;
+    /**
+     * Returns the list of subtask IDs associated with this epic.
+     *
+     * @return a list of subtask IDs
+     */
+    public List<Integer> getSubIdList() {
+        return subTaskIdList;
     }
 
+    /**
+     * Returns a string representation of the epic task.
+     *
+     * @return a formatted string with epic details and its subtasks
+     */
     @Override
     public String toString() {
-        return "E{" +
-                "Name:" + this.getTitle() + " \\ " +
-                this.getDescription() +
-                "|ID:" + this.getID() +
-                "|S:" + this.getStatus() +
-                "|ST:" + subTaskIDList +
-                "}";
+        return "E{"
+                + "Name:" + this.getTitle() + " \\ "
+                + this.getDescription()
+                + "|Id:" + this.getId()
+                + "|S:" + this.getStatus()
+                + "|ST:" + subTaskIdList
+                + "}";
     }
 }
