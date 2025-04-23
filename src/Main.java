@@ -1,5 +1,11 @@
-import kanban.managers.*;
-import kanban.tasks.*;
+import static kanban.tasks.TaskStatus.DONE;
+import static kanban.tasks.TaskStatus.IN_PROGRESS;
+
+import kanban.managers.Managers;
+import kanban.managers.TaskManager;
+import kanban.tasks.Epic;
+import kanban.tasks.SubTask;
+import kanban.tasks.Task;
 
 public class Main {
     public static void main(String[] args) {
@@ -28,22 +34,28 @@ public class Main {
 
         // Checking manager storage maps
         System.out.println("Stage 1: Initialization");
-        for (Task task : manager.getTaskList()) System.out.println(task);
-        for (Epic epic : manager.getEpicList()) System.out.println(epic);
-        for (SubTask sub : manager.getSubList()) System.out.println(sub);
+        for (Task task : manager.getTaskList()) {
+            System.out.println(task);
+        }
+        for (Epic epic : manager.getEpicList()) {
+            System.out.println(epic);
+        }
+        for (SubTask sub : manager.getSubList()) {
+            System.out.println(sub);
+        }
 
         // Linking epic task and subtask then updating task
-        epicA = manager.getEpicByID(epicA.getID());
-        epicB = manager.getEpicByID(epicB.getID());
-        subA = manager.getSubTaskByID(subA.getID());
-        subB = manager.getSubTaskByID(subB.getID());
-        subC = manager.getSubTaskByID(subC.getID());
-        epicA.addSubID(subA.getID());
-        epicA.addSubID(subB.getID());
-        epicB.addSubID(subC.getID());
-        subA.setParentID(epicA.getID());
-        subB.setParentID(epicA.getID());
-        subC.setParentID(epicB.getID());
+        epicA = manager.getEpicById(epicA.getId());
+        epicB = manager.getEpicById(epicB.getId());
+        subA = manager.getSubTaskById(subA.getId());
+        subB = manager.getSubTaskById(subB.getId());
+        subC = manager.getSubTaskById(subC.getId());
+        epicA.addSubId(subA.getId());
+        epicA.addSubId(subB.getId());
+        epicB.addSubId(subC.getId());
+        subA.setParentId(epicA.getId());
+        subB.setParentId(epicA.getId());
+        subC.setParentId(epicB.getId());
         manager.updateSub(subA);
         manager.updateSub(subB);
         manager.updateSub(subC);
@@ -52,36 +64,54 @@ public class Main {
 
         // Checking epic<->subtask link
         System.out.println("\nStage 2: Epic<->Sub linking");
-        for (Task task : manager.getTaskList()) System.out.println(task);
-        for (Epic epic : manager.getEpicList()) System.out.println(epic);
-        for (SubTask sub : manager.getSubList()) System.out.println(sub);
+        for (Task task : manager.getTaskList()) {
+            System.out.println(task);
+        }
+        for (Epic epic : manager.getEpicList()) {
+            System.out.println(epic);
+        }
+        for (SubTask sub : manager.getSubList()) {
+            System.out.println(sub);
+        }
 
         // Change task status then update task
-        taskA = manager.getTaskByID(taskA.getID());
-        subA = manager.getSubTaskByID(subA.getID());
-        subC = manager.getSubTaskByID(subC.getID());
-        taskA.setStatus(TaskStatus.IN_PROGRESS);
-        subA.setStatus(TaskStatus.IN_PROGRESS);
-        subC.setStatus(TaskStatus.DONE);
+        taskA = manager.getTaskById(taskA.getId());
+        subA = manager.getSubTaskById(subA.getId());
+        subC = manager.getSubTaskById(subC.getId());
+        taskA.setStatus(IN_PROGRESS);
+        subA.setStatus(IN_PROGRESS);
+        subC.setStatus(DONE);
         manager.updateTask(taskA);
         manager.updateSub(subA);
         manager.updateSub(subC);
 
         // Checking task status update
         System.out.println("\nStage 3: Change task statuses");
-        for (Task task : manager.getTaskList()) System.out.println(task);
-        for (Epic epic : manager.getEpicList()) System.out.println(epic);
-        for (SubTask sub : manager.getSubList()) System.out.println(sub);
+        for (Task task : manager.getTaskList()) {
+            System.out.println(task);
+        }
+        for (Epic epic : manager.getEpicList()) {
+            System.out.println(epic);
+        }
+        for (SubTask sub : manager.getSubList()) {
+            System.out.println(sub);
+        }
 
         // Remove some task
-        manager.removeTaskByID(taskB.getID());
-        manager.removeSubByID(subA.getID());
-        manager.removeEpicByID(epicB.getID());
+        manager.removeTaskById(taskB.getId());
+        manager.removeSubById(subA.getId());
+        manager.removeEpicById(epicB.getId());
 
         System.out.println("\nStage 4: Task removing");
-        for (Task task : manager.getTaskList()) System.out.println(task);
-        for (Epic epic : manager.getEpicList()) System.out.println(epic);
-        for (SubTask sub : manager.getSubList()) System.out.println(sub);
+        for (Task task : manager.getTaskList()) {
+            System.out.println(task);
+        }
+        for (Epic epic : manager.getEpicList()) {
+            System.out.println(epic);
+        }
+        for (SubTask sub : manager.getSubList()) {
+            System.out.println(sub);
+        }
 
 
         System.out.println("\nScenario B.");
@@ -106,62 +136,84 @@ public class Main {
         manager.addSub(subC);
 
         System.out.println("Stage 1: Initialization");
-        for (Task task : manager.getTaskList()) System.out.println(task);
-        for (Epic epic : manager.getEpicList()) System.out.println(epic);
-        for (SubTask sub : manager.getSubList()) System.out.println(sub);
+        for (Task task : manager.getTaskList()) {
+            System.out.println(task);
+        }
+        for (Epic epic : manager.getEpicList()) {
+            System.out.println(epic);
+        }
+        for (SubTask sub : manager.getSubList()) {
+            System.out.println(sub);
+        }
 
         // Linking epic task and subtask then updating task
-        epicA = manager.getEpicByID(epicA.getID());
-        subA = manager.getSubTaskByID(subA.getID());
-        subB = manager.getSubTaskByID(subB.getID());
-        subC = manager.getSubTaskByID(subC.getID());
-        epicA.addSubID(subA.getID());
-        epicA.addSubID(subB.getID());
-        epicA.addSubID(subC.getID());
-        subA.setParentID(epicA.getID());
-        subB.setParentID(epicA.getID());
-        subC.setParentID(epicA.getID());
+        epicA = manager.getEpicById(epicA.getId());
+        subA = manager.getSubTaskById(subA.getId());
+        subB = manager.getSubTaskById(subB.getId());
+        subC = manager.getSubTaskById(subC.getId());
+        epicA.addSubId(subA.getId());
+        epicA.addSubId(subB.getId());
+        epicA.addSubId(subC.getId());
+        subA.setParentId(epicA.getId());
+        subB.setParentId(epicA.getId());
+        subC.setParentId(epicA.getId());
         manager.updateSub(subA);
         manager.updateSub(subB);
         manager.updateSub(subC);
         manager.updateEpic(epicA);
 
         System.out.println("\nStage 2: Epic<->Sub linking");
-        for (Task task : manager.getTaskList()) System.out.println(task);
-        for (Epic epic : manager.getEpicList()) System.out.println(epic);
-        for (SubTask sub : manager.getSubList()) System.out.println(sub);
+        for (Task task : manager.getTaskList()) {
+            System.out.println(task);
+        }
+        for (Epic epic : manager.getEpicList()) {
+            System.out.println(epic);
+        }
+        for (SubTask sub : manager.getSubList()) {
+            System.out.println(sub);
+        }
 
         // Getting task and check history for duplicate entry
-        manager.getEpicByID(epicA.getID());
-        manager.getTaskByID(taskA.getID());
-        manager.getSubTaskByID(subA.getID());
-        manager.getEpicByID(epicB.getID());
+        manager.getEpicById(epicA.getId());
+        manager.getTaskById(taskA.getId());
+        manager.getSubTaskById(subA.getId());
+        manager.getEpicById(epicB.getId());
         System.out.println("\nStage 3-1: History integrity check");
-        for (Task task : manager.getHistoryTask()) System.out.println(task);
+        for (Task task : manager.getHistoryTask()) {
+            System.out.println(task);
+        }
 
-        manager.getTaskByID(taskB.getID());
-        manager.getSubTaskByID(subB.getID());
-        manager.getTaskByID(taskA.getID());
-        manager.getEpicByID(epicA.getID());
+        manager.getTaskById(taskB.getId());
+        manager.getSubTaskById(subB.getId());
+        manager.getTaskById(taskA.getId());
+        manager.getEpicById(epicA.getId());
         System.out.println("\nStage 3-2: History integrity check");
-        for (Task task : manager.getHistoryTask()) System.out.println(task);
+        for (Task task : manager.getHistoryTask()) {
+            System.out.println(task);
+        }
 
-        manager.getSubTaskByID(subB.getID());
-        manager.getSubTaskByID(subB.getID());
-        manager.getTaskByID(taskB.getID());
-        manager.getSubTaskByID(subC.getID());
+        manager.getSubTaskById(subB.getId());
+        manager.getSubTaskById(subB.getId());
+        manager.getTaskById(taskB.getId());
+        manager.getSubTaskById(subC.getId());
         System.out.println("\nStage 3-3: History integrity check");
-        for (Task task : manager.getHistoryTask()) System.out.println(task);
+        for (Task task : manager.getHistoryTask()) {
+            System.out.println(task);
+        }
 
 
         // Removing one task then check history
-        manager.removeTaskByID(taskA.getID());
+        manager.removeTaskById(taskA.getId());
         System.out.println("\nStage 4: Removing taskA, checking history");
-        for (Task task : manager.getHistoryTask()) System.out.println(task);
+        for (Task task : manager.getHistoryTask()) {
+            System.out.println(task);
+        }
 
         // Removing epic with 3 subtask then check history
-        manager.removeEpicByID(epicA.getID());
+        manager.removeEpicById(epicA.getId());
         System.out.println("\nStage 5: Removing epicA, checking history");
-        for (Task task : manager.getHistoryTask()) System.out.println(task);
+        for (Task task : manager.getHistoryTask()) {
+            System.out.println(task);
+        }
     }
 }

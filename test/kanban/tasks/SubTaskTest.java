@@ -1,8 +1,11 @@
 package kanban.tasks;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 class SubTaskTest {
 
@@ -19,20 +22,20 @@ class SubTaskTest {
 
     @Test
     void givenSubtask_whenSettingItAsItsOwnEpic_thenThrowException() {
-        assertThrows(IllegalArgumentException.class, () -> subA.setParentID(subA.getID()));
+        assertThrows(IllegalArgumentException.class, () -> subA.setParentId(subA.getId()));
     }
 
     @Test
-    void givenSubTask_whenSetSubParentTaskAsEpic_thenSubParentTaskNotNullandEqualEpicID() {
-        subA.setParentID(epicA.getID());
-        assertNotNull(subA.getParentID());
-        assertEquals(subA.getParentID(), epicA.getID());
+    void givenSubTask_whenSetSubParentTaskAsEpic_thenSubParentTaskEqualEpicId() {
+        subA.setParentId(epicA.getId());
+        assertNotNull(subA.getParentId());
+        assertEquals(subA.getParentId(), epicA.getId());
     }
 
     @Test
-    void givenTwoSubWithSameID_whenIDEquals_thenSubEquals() {
-        subA.setID(1);
-        subB.setID(1);
+    void givenTwoSubWithSameId_whenIdEquals_thenSubEquals() {
+        subA.setId(1);
+        subB.setId(1);
         assertEquals(subA, subB);
     }
 }
