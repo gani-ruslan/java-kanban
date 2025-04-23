@@ -20,7 +20,7 @@
 
 1. Клонируйте репозиторий:
    ```bash
-   git clone https://github.com/ваш-юзернейм/kanban.git
+   git clone https://github.com/ваш-юзернейм/java-kanban.git
    ```
 2. Откройте проект в вашей любимой IDE (например, IntelliJ IDEA).
 3. Запустите файл `Main.java`.
