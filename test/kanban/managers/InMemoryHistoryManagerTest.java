@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -62,7 +61,7 @@ public class InMemoryHistoryManagerTest {
         historyManager.add(taskB);
         historyManager.add(taskC);
         historyManager.add(taskA);
-        List<Task> expectedOrder = Arrays.asList(taskB, taskC, taskA);
+        List<Task> expectedOrder = List.of(taskB, taskC, taskA);
         assertEquals(expectedOrder, historyManager.getTasks());
     }
 
@@ -75,7 +74,7 @@ public class InMemoryHistoryManagerTest {
         historyManager.add(taskB);
         historyManager.add(taskA);
         assertFalse(hasDuplicates(historyManager.getTasks()));
-        List<Task> expectedOrder = Arrays.asList(taskC, taskB, taskA);
+        List<Task> expectedOrder = List.of(taskC, taskB, taskA);
         assertEquals(expectedOrder, historyManager.getTasks());
     }
 
@@ -88,12 +87,12 @@ public class InMemoryHistoryManagerTest {
         historyManager.add(taskD);
         historyManager.remove(taskC.getId());
         assertFalse(hasDuplicates(historyManager.getTasks()));
-        List<Task> expectedOrder = Arrays.asList(taskB, taskD);
+        List<Task> expectedOrder = List.of(taskB, taskD);
         assertEquals(expectedOrder, historyManager.getTasks());
     }
 
     // Utility method for search duplicates in ArrayList
-    public <T> boolean hasDuplicates(ArrayList<T> list) {
+    private <T> boolean hasDuplicates(ArrayList<T> list) {
         Set<T> set = new HashSet<>();
         for (T item : list) {
             if (!set.add(item)) {

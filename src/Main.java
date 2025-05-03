@@ -1,6 +1,9 @@
 import static kanban.tasks.TaskStatus.DONE;
 import static kanban.tasks.TaskStatus.IN_PROGRESS;
 
+import java.io.File;
+import java.io.IOException;
+import kanban.managers.FileBackedTaskManager;
 import kanban.managers.Managers;
 import kanban.managers.TaskManager;
 import kanban.tasks.Epic;
@@ -8,11 +11,17 @@ import kanban.tasks.SubTask;
 import kanban.tasks.Task;
 
 public class Main {
-    public static void main(String[] args) {
 
-        System.out.println("Scenario A.");
-        // Manager initialization
-        TaskManager manager = Managers.getDefault();
+    public static void main(String[] args) {
+        System.out.println("FileBackedTaskManager: test scenario A.");
+        File tempFile;
+        try {
+            tempFile = File.createTempFile("_tempCSV", ".csv");
+        } catch (IOException e) {
+            System.out.println("Can't create temporary file." + e.getMessage());
+            return;
+        }
+        FileBackedTaskManager taskManager = Managers.getFileBackedManager(tempFile);
 
         // Create different task type
         Task taskA = new Task("Task A", "Description A");
@@ -22,6 +31,66 @@ public class Main {
         SubTask subA = new SubTask("Subtask A", "Description E");
         SubTask subB = new SubTask("Subtask B", "Description F");
         SubTask subC = new SubTask("Subtask C", "Description G");
+
+        // Adding task into manager
+        taskManager.addTask(taskA);
+        taskManager.addTask(taskB);
+        taskManager.addEpic(epicA);
+        taskManager.addEpic(epicB);
+        taskManager.addSub(subA);
+        taskManager.addSub(subB);
+        taskManager.addSub(subC);
+
+        // Linking epic task and subtask then updating task
+        epicA = taskManager.getEpicById(epicA.getId());
+        epicB = taskManager.getEpicById(epicB.getId());
+        subA = taskManager.getSubTaskById(subA.getId());
+        subB = taskManager.getSubTaskById(subB.getId());
+        subC = taskManager.getSubTaskById(subC.getId());
+        epicA.addSubId(subA.getId());
+        epicA.addSubId(subB.getId());
+        epicB.addSubId(subC.getId());
+        subA.setParentId(epicA.getId());
+        subB.setParentId(epicA.getId());
+        subC.setParentId(epicB.getId());
+        taskManager.updateSub(subA);
+        taskManager.updateSub(subB);
+        taskManager.updateSub(subC);
+        taskManager.updateEpic(epicA);
+        taskManager.updateEpic(epicB);
+
+        // Change task status then update task
+        taskA = taskManager.getTaskById(taskA.getId());
+        subA = taskManager.getSubTaskById(subA.getId());
+        subC = taskManager.getSubTaskById(subC.getId());
+        taskA.setStatus(IN_PROGRESS);
+        subA.setStatus(IN_PROGRESS);
+        subC.setStatus(DONE);
+        taskManager.updateTask(taskA);
+        taskManager.updateSub(subA);
+        taskManager.updateSub(subC);
+
+        FileBackedTaskManager taskManagerRestored = FileBackedTaskManager.loadFromFile(tempFile);
+        tempFile.deleteOnExit();
+
+        System.out.println("Restored task manager:");
+        showTask(taskManagerRestored);
+        System.out.println("\nOriginal task manager:");
+        showTask(taskManager);
+
+        System.out.println("\n\nInMemoryTaskManager: test scenario A.");
+
+        // Create different task type
+        taskA = new Task("Task A", "Description A");
+        taskB = new Task("Task B", "Description B");
+        epicA = new Epic("Epic A", "Description C");
+        epicB = new Epic("Epic B", "Description D");
+        subA = new SubTask("Subtask A", "Description E");
+        subB = new SubTask("Subtask B", "Description F");
+        subC = new SubTask("Subtask C", "Description G");
+
+        // Manager initialization
+        TaskManager manager = Managers.getDefault();
 
         // Adding task into manager
         manager.addTask(taskA);
@@ -34,15 +103,7 @@ public class Main {
 
         // Checking manager storage maps
         System.out.println("Stage 1: Initialization");
-        for (Task task : manager.getTaskList()) {
-            System.out.println(task);
-        }
-        for (Epic epic : manager.getEpicList()) {
-            System.out.println(epic);
-        }
-        for (SubTask sub : manager.getSubList()) {
-            System.out.println(sub);
-        }
+        showTask(manager);
 
         // Linking epic task and subtask then updating task
         epicA = manager.getEpicById(epicA.getId());
@@ -64,15 +125,7 @@ public class Main {
 
         // Checking epic<->subtask link
         System.out.println("\nStage 2: Epic<->Sub linking");
-        for (Task task : manager.getTaskList()) {
-            System.out.println(task);
-        }
-        for (Epic epic : manager.getEpicList()) {
-            System.out.println(epic);
-        }
-        for (SubTask sub : manager.getSubList()) {
-            System.out.println(sub);
-        }
+        showTask(manager);
 
         // Change task status then update task
         taskA = manager.getTaskById(taskA.getId());
@@ -87,15 +140,7 @@ public class Main {
 
         // Checking task status update
         System.out.println("\nStage 3: Change task statuses");
-        for (Task task : manager.getTaskList()) {
-            System.out.println(task);
-        }
-        for (Epic epic : manager.getEpicList()) {
-            System.out.println(epic);
-        }
-        for (SubTask sub : manager.getSubList()) {
-            System.out.println(sub);
-        }
+        showTask(manager);
 
         // Remove some task
         manager.removeTaskById(taskB.getId());
@@ -103,18 +148,9 @@ public class Main {
         manager.removeEpicById(epicB.getId());
 
         System.out.println("\nStage 4: Task removing");
-        for (Task task : manager.getTaskList()) {
-            System.out.println(task);
-        }
-        for (Epic epic : manager.getEpicList()) {
-            System.out.println(epic);
-        }
-        for (SubTask sub : manager.getSubList()) {
-            System.out.println(sub);
-        }
+        showTask(manager);
 
-
-        System.out.println("\nScenario B.");
+        System.out.println("\n\nInMemoryTaskManager/InMemoryHistoryManager: test scenario B.");
         manager = Managers.getDefault();
 
         // Create different task type
@@ -136,15 +172,7 @@ public class Main {
         manager.addSub(subC);
 
         System.out.println("Stage 1: Initialization");
-        for (Task task : manager.getTaskList()) {
-            System.out.println(task);
-        }
-        for (Epic epic : manager.getEpicList()) {
-            System.out.println(epic);
-        }
-        for (SubTask sub : manager.getSubList()) {
-            System.out.println(sub);
-        }
+        showTask(manager);
 
         // Linking epic task and subtask then updating task
         epicA = manager.getEpicById(epicA.getId());
@@ -163,15 +191,7 @@ public class Main {
         manager.updateEpic(epicA);
 
         System.out.println("\nStage 2: Epic<->Sub linking");
-        for (Task task : manager.getTaskList()) {
-            System.out.println(task);
-        }
-        for (Epic epic : manager.getEpicList()) {
-            System.out.println(epic);
-        }
-        for (SubTask sub : manager.getSubList()) {
-            System.out.println(sub);
-        }
+        showTask(manager);
 
         // Getting task and check history for duplicate entry
         manager.getEpicById(epicA.getId());
@@ -214,6 +234,20 @@ public class Main {
         System.out.println("\nStage 5: Removing epicA, checking history");
         for (Task task : manager.getHistoryTask()) {
             System.out.println(task);
+        }
+    }
+
+    private static void showTask(TaskManager manager) {
+        for (Task task : manager.getTaskList()) {
+            System.out.println(task.toString());
+        }
+        for (Epic epic : manager.getEpicList()) {
+            System.out.println(epic.toString());
+            if (!epic.getSubIdList().isEmpty()) {
+                for (Integer subTaskId : epic.getSubIdList()) {
+                    System.out.println("\t" + manager.getSubTaskById(subTaskId).toString());
+                }
+            }
         }
     }
 }
