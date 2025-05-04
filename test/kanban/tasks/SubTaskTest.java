@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class SubTaskTest {
@@ -18,6 +19,13 @@ class SubTaskTest {
         subA = new SubTask("Sub A", "Description A");
         subB = new SubTask("Sub B", "Description B");
         epicA = new Epic("Epic A", "Description C");
+    }
+
+    @BeforeEach
+    void beforeEachTest() {
+        subA.setId(1);
+        subB.setId(2);
+        epicA.setId(3);
     }
 
     @Test

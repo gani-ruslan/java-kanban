@@ -10,43 +10,43 @@ import org.junit.jupiter.api.Test;
 
 class TaskTest {
 
-    private static Task TaskA;
-    private static Task TaskB;
+    private static Task taskA;
+    private static Task taskB;
 
     @BeforeAll
     static void beforeAllTest() {
-        TaskA = new Task("Task A", "Description A");
-        TaskB = new Task("Task B", "Description B");
+        taskA = new Task("Task A", "Description A");
+        taskB = new Task("Task B", "Description B");
     }
 
     @BeforeEach
     void beforeEachTest() {
-        TaskA.setId(1);
-        TaskB.setId(2);
+        taskA.setId(1);
+        taskB.setId(2);
     }
 
     @Test
     void givenTwoTaskWithSameId_whenIdEquals_thenTaskEquals() {
-        TaskA.setId(1);
-        TaskB.setId(1);
-        assertEquals(TaskA, TaskB);
+        taskA.setId(1);
+        taskB.setId(1);
+        assertEquals(taskA, taskB);
     }
 
     @Test
     void givenName_whenSetNewName_thenChangeName() {
-        TaskA.setTitle("Task A modified");
-        assertEquals("Task A modified", TaskA.getTitle());
+        taskA.setTitle("Task A modified");
+        assertEquals("Task A modified", taskA.getTitle());
     }
 
     @Test
     void givenDescription_whenSetNewDescription_thenChangeDescription() {
-        TaskA.setDescription("Description A modified");
-        assertEquals("Description A modified", TaskA.getDescription());
+        taskA.setDescription("Description A modified");
+        assertEquals("Description A modified", taskA.getDescription());
     }
 
     @Test
     void givenStatus_whenSetNewStatus_thenChangeStatus() {
-        TaskA.setStatus(IN_PROGRESS);
-        assertEquals(IN_PROGRESS, TaskA.getStatus());
+        taskA.setStatus(IN_PROGRESS);
+        assertEquals(IN_PROGRESS, taskA.getStatus());
     }
 }

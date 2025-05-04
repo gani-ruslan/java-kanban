@@ -12,23 +12,24 @@ import java.util.NoSuchElementException;
 import kanban.tasks.Epic;
 import kanban.tasks.SubTask;
 import kanban.tasks.Task;
+import kanban.tasks.TaskStatus;
 
 /**
  * InMemoryTaskManager is an in-memory implementation of the TaskManager interface.
  * It manages tasks, epics, and subtasks using separate maps.
  * Main responsibilities:
- * - Create, retrieve, update, and delete tasks of all types</li>
- * - Manage relationships between epics and subtasks</li>
- * - Automatically update the status of epics based on their subtasks</li>
- * - Maintain a history of accessed tasks using a HistoryManager</li>
+ * - Create, retrieve, update, and delete tasks of all types
+ * - Manage relationships between epics and subtasks
+ * - Automatically update the status of epics based on their subtasks
+ * - Maintain a history of accessed tasks using a HistoryManager
  * This manager does not provide persistence and is intended for use in memory only.
  */
 public class InMemoryTaskManager implements TaskManager {
-    private Integer globalIdCounter;
-    private final HistoryManager history;
-    private final Map<Integer, Task> taskStorageMap;
-    private final Map<Integer, Epic> epicStorageMap;
-    private final Map<Integer, SubTask> subStorageMap;
+    protected Integer globalIdCounter;
+    protected final HistoryManager history;
+    protected final Map<Integer, Task> taskStorageMap;
+    protected final Map<Integer, Epic> epicStorageMap;
+    protected final Map<Integer, SubTask> subStorageMap;
 
     /**
      * Constructs a new InMemoryTaskManager with empty storages
@@ -77,9 +78,9 @@ public class InMemoryTaskManager implements TaskManager {
      * Returns a list of all subtasks belonging to a specific epic.
      *
      * @param epicId The ID of the epic whose subtasks are requested
-     * @return List of subtasks belonging to the specified epic
+     * @return List of subtasks objects belonging to the specified epic
      * @throws IllegalArgumentException if epicId is null
-     * @throws NoSuchElementException if no epic with the specified ID exists
+     * @throws NoSuchElementException   if no epic with the specified ID exists
      */
     @Override
     public List<SubTask> getEpicSubTaskList(Integer epicId) {
@@ -101,9 +102,9 @@ public class InMemoryTaskManager implements TaskManager {
      * Retrieves a task by its ID and adds it to the history.
      *
      * @param taskId The ID of the task to retrieve
-     * @return The requested task
+     * @return The requested task object
      * @throws IllegalArgumentException if taskId is null
-     * @throws NoSuchElementException if no task with the specified ID exists
+     * @throws NoSuchElementException   if no task with the specified ID exists
      */
     @Override
     public Task getTaskById(Integer taskId) {
@@ -114,9 +115,9 @@ public class InMemoryTaskManager implements TaskManager {
      * Retrieves an epic by its ID and adds it to the history.
      *
      * @param epicId The ID of the epic to retrieve
-     * @return The requested epic
+     * @return The requested epic object
      * @throws IllegalArgumentException if epicId is null
-     * @throws NoSuchElementException if no epic with the specified ID exists
+     * @throws NoSuchElementException   if no epic with the specified ID exists
      */
     @Override
     public Epic getEpicById(Integer epicId) {
@@ -127,9 +128,9 @@ public class InMemoryTaskManager implements TaskManager {
      * Retrieves a subtask by its ID and adds it to the history.
      *
      * @param subId The ID of the subtask to retrieve
-     * @return The requested subtask
+     * @return The requested subtask object
      * @throws IllegalArgumentException if subId is null
-     * @throws NoSuchElementException if no subtask with the specified ID exists
+     * @throws NoSuchElementException   if no subtask with the specified ID exists
      */
     @Override
     public SubTask getSubTaskById(Integer subId) {
@@ -137,7 +138,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     /**
-     * Returns the history of recently viewed tasks.
+     * Returns the Task objects ArrayList of recently viewed tasks.
      *
      * @return List of tasks in the order they were accessed
      */
@@ -158,7 +159,9 @@ public class InMemoryTaskManager implements TaskManager {
             throw new IllegalArgumentException("New Task must not be null.");
         }
 
-        newTask.setId(generateId());
+        if (newTask.getId() == 0) {
+            newTask.setId(generateId());
+        }
         taskStorageMap.put(newTask.getId(), new Task(newTask));
     }
 
@@ -174,7 +177,9 @@ public class InMemoryTaskManager implements TaskManager {
             throw new IllegalArgumentException("New Epic must not be null.");
         }
 
-        newEpic.setId(generateId());
+        if (newEpic.getId() == 0) {
+            newEpic.setId(generateId());
+        }
         epicStorageMap.put(newEpic.getId(), new Epic(newEpic));
     }
 
@@ -190,7 +195,9 @@ public class InMemoryTaskManager implements TaskManager {
             throw new IllegalArgumentException("New Subtask must not be null.");
         }
 
-        newSub.setId(generateId());
+        if (newSub.getId() == 0) {
+            newSub.setId(generateId());
+        }
         subStorageMap.put(newSub.getId(), new SubTask(newSub));
     }
 
@@ -199,7 +206,7 @@ public class InMemoryTaskManager implements TaskManager {
      *
      * @param updateTask The task with updated data
      * @throws IllegalArgumentException if updateTask is null
-     * @throws NoSuchElementException if no task with the specified ID exists
+     * @throws NoSuchElementException   if no task with the specified ID exists
      */
     @Override
     public void updateTask(Task updateTask) {
@@ -207,11 +214,10 @@ public class InMemoryTaskManager implements TaskManager {
             throw new IllegalArgumentException("Updated Task must not be null.");
         }
         if (!taskStorageMap.containsKey(updateTask.getId())) {
-            throw new NoSuchElementException("Subtask with Id:"
+            throw new NoSuchElementException("Task with Id:"
                     + updateTask.getId() + " not found.");
         }
 
-        // Potential SECURITY BREACH
         taskStorageMap.put(updateTask.getId(), new Task(updateTask));
     }
 
@@ -220,7 +226,7 @@ public class InMemoryTaskManager implements TaskManager {
      *
      * @param updateEpic The epic with updated data
      * @throws IllegalArgumentException if updateEpic is null
-     * @throws NoSuchElementException if no epic with the specified ID exists
+     * @throws NoSuchElementException   if no epic with the specified ID exists
      */
     @Override
     public void updateEpic(Epic updateEpic) {
@@ -231,7 +237,6 @@ public class InMemoryTaskManager implements TaskManager {
             throw new NoSuchElementException("Epic with Id:" + updateEpic.getId() + " not found.");
         }
 
-        // Potential SECURITY BREACH
         epicStorageMap.put(updateEpic.getId(), new Epic(updateEpic));
         updateStatus(updateEpic.getId());
     }
@@ -241,7 +246,7 @@ public class InMemoryTaskManager implements TaskManager {
      *
      * @param updateSub The subtask with updated data
      * @throws IllegalArgumentException if updateSub is null
-     * @throws NoSuchElementException if no subtask with the specified ID exists
+     * @throws NoSuchElementException   if no subtask with the specified ID exists
      */
     @Override
     public void updateSub(SubTask updateSub) {
@@ -253,7 +258,6 @@ public class InMemoryTaskManager implements TaskManager {
                     + updateSub.getId() + " not found.");
         }
 
-        // Potential SECURITY BREACH
         subStorageMap.put(updateSub.getId(), new SubTask(updateSub));
         updateStatus(updateSub.getParentId());
     }
@@ -263,7 +267,7 @@ public class InMemoryTaskManager implements TaskManager {
      *
      * @param taskId The ID of the task to remove
      * @throws IllegalArgumentException if taskId is null
-     * @throws NoSuchElementException if no task with the specified ID exists
+     * @throws NoSuchElementException   if no task with the specified ID exists
      */
     @Override
     public void removeTaskById(Integer taskId) {
@@ -283,7 +287,7 @@ public class InMemoryTaskManager implements TaskManager {
      *
      * @param epicId The ID of the epic to remove
      * @throws IllegalArgumentException if epicId is null
-     * @throws NoSuchElementException if no epic with the specified ID exists
+     * @throws NoSuchElementException   if no epic with the specified ID exists
      */
     @Override
     public void removeEpicById(Integer epicId) {
@@ -308,7 +312,7 @@ public class InMemoryTaskManager implements TaskManager {
      *
      * @param subId The ID of the subtask to remove
      * @throws IllegalArgumentException if subId is null
-     * @throws NoSuchElementException if no subtask with the specified ID exists
+     * @throws NoSuchElementException   if no subtask with the specified ID exists
      */
     @Override
     public void removeSubById(Integer subId) {
@@ -394,13 +398,13 @@ public class InMemoryTaskManager implements TaskManager {
     /**
      * Generic method to retrieve a task by ID from any storage map.
      *
-     * @param <T> The type of task (Task, Epic, or SubTask)
+     * @param <T>        The type of task (Task, Epic, or SubTask)
      * @param storageMap The map to search for the task
-     * @param taskId The ID of the task to retrieve
-     * @param history The history manager to record the access
+     * @param taskId     The ID of the task to retrieve
+     * @param history    The history manager to record the access
      * @return The requested task
      * @throws IllegalArgumentException if taskId is null
-     * @throws NoSuchElementException if no task with the specified ID exists
+     * @throws NoSuchElementException   if no task with the specified ID exists
      */
     private <T extends Task> T getTaskByIdGeneric(Map<Integer, T> storageMap,
                                                   Integer taskId,
@@ -422,7 +426,7 @@ public class InMemoryTaskManager implements TaskManager {
      *
      * @param epicId The ID of the epic to update
      * @throws IllegalArgumentException if epicId is null
-     * @throws NoSuchElementException if no epic with the specified ID exists
+     * @throws NoSuchElementException   if no epic with the specified ID exists
      */
     private void updateStatus(Integer epicId) {
         if (epicId == null) {
@@ -432,35 +436,25 @@ public class InMemoryTaskManager implements TaskManager {
             throw new NoSuchElementException("Epic with Id:" + epicId + " not found.");
         }
 
-        Epic epicTask = epicStorageMap.get(epicId);
-        List<Integer> subTaskList = epicTask.getSubIdList();
-
-        if (subTaskList.isEmpty()) {
-            epicTask.setStatus(NEW);
+        if (epicStorageMap.get(epicId).getSubIdList().isEmpty()) {
+            epicStorageMap.get(epicId).setStatus(NEW);
             return;
         }
 
-        int countDoneTask = 0;
-        int countInProgressTask = 0;
+        TaskStatus newStatus = DONE;
 
-        for (Integer subId : subTaskList) {
-            SubTask subTask = subStorageMap.get(subId);
-            if (subTask == null) {
+        for (Integer subId : epicStorageMap.get(epicId).getSubIdList()) {
+            if (subStorageMap.get(subId) == null) {
                 continue;
             }
-            switch (subTask.getStatus()) {
-                case DONE -> countDoneTask++;
-                case IN_PROGRESS -> countInProgressTask++;
-                default -> {}
+            if (subStorageMap.get(subId).getStatus() == IN_PROGRESS
+                    | (subStorageMap.get(subId).getStatus() == DONE && newStatus == NEW)) {
+                epicStorageMap.get(epicId).setStatus(IN_PROGRESS);
+                return;
+            } else if (subStorageMap.get(subId).getStatus() == NEW && newStatus == DONE) {
+                newStatus = NEW;
             }
         }
-
-        if (countDoneTask == subTaskList.size()) {
-            epicTask.setStatus(DONE);
-        } else if (countInProgressTask > 0) {
-            epicTask.setStatus(IN_PROGRESS);
-        } else {
-            epicTask.setStatus(NEW);
-        }
+        epicStorageMap.get(epicId).setStatus(newStatus);
     }
 }

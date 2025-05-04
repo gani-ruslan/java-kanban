@@ -1,5 +1,7 @@
 package kanban.tasks;
 
+import static kanban.tasks.TaskType.EPIC;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +12,14 @@ import java.util.List;
 public class Epic extends Task {
 
     private final List<Integer> subTaskIdList;
+
+    /**
+     * Constructor for creating a new empty Epic with status NEW and default ID.
+     */
+    public Epic() {
+        super();
+        subTaskIdList = new ArrayList<>();
+    }
 
     /**
      * Constructor for creating a new Epic with an empty list of subtasks.
@@ -30,8 +40,21 @@ public class Epic extends Task {
      * @param epic the epic to copy from
      */
     public Epic(Epic epic) {
-        super(epic.getTitle(), epic.getDescription(), epic.getId(), epic.getStatus());
+        super(epic.getId(), epic.getTitle(), epic.getStatus(), epic.getDescription());
         subTaskIdList = epic.getSubIdList();
+    }
+
+    /**
+     * Constructor for creating new SubTask with fromString method.
+     *
+     * @param id the subtask id
+     * @param title the subtask title
+     * @param status the subtask status
+     * @param description the subtask description
+     */
+    public Epic(Integer id, String title, TaskStatus status, String description) {
+        super(id, title, status, description);
+        this.subTaskIdList = new ArrayList<>();
     }
 
     /**
@@ -82,18 +105,27 @@ public class Epic extends Task {
     }
 
     /**
+     * Returns the task type.
+     *
+     * @return the type of the task
+     */
+    @Override
+    public TaskType getType() {
+        return EPIC;
+    }
+
+    /**
      * Returns a string representation of the epic task.
      *
      * @return a formatted string with epic details and its subtasks
      */
     @Override
     public String toString() {
-        return "E{"
-                + "Name:" + this.getTitle() + " \\ "
-                + this.getDescription()
-                + "|Id:" + this.getId()
-                + "|S:" + this.getStatus()
-                + "|ST:" + subTaskIdList
-                + "}";
+        return "EPIC[ID:" + this.getId()
+                + " T:" + this.getTitle()
+                + " S:" + this.getStatus()
+                + " D:" + this.getDescription()
+                + " SB:" + this.subTaskIdList.toString()
+                + "]";
     }
 }

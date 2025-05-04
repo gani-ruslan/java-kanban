@@ -1,6 +1,7 @@
 package kanban.tasks;
 
 import static kanban.tasks.TaskStatus.NEW;
+import static kanban.tasks.TaskType.TASK;
 
 import java.util.Objects;
 
@@ -14,6 +15,16 @@ public class Task {
     private String title;
     private String description;
     private TaskStatus status;
+
+    /**
+     * Constructor for creating a new empty task with status NEW and default ID.
+     */
+    public Task() {
+        title = "";
+        description = "";
+        id = 0;
+        status = NEW;
+    }
 
     /**
      * Constructor for creating a new task with status NEW and default ID.
@@ -36,7 +47,7 @@ public class Task {
      * @param id          the task ID
      * @param status      the task status
      */
-    public Task(String title, String description, Integer id, TaskStatus status) {
+    public Task(Integer id, String title, TaskStatus status, String description) {
         this.title = title;
         this.description = description;
         this.id = id;
@@ -128,6 +139,15 @@ public class Task {
     }
 
     /**
+     * Returns the task type.
+     *
+     * @return the type of the task
+     */
+    public TaskType getType() {
+        return TASK;
+    }
+
+    /**
      * Compares this task to another based on ID.
      *
      * @param taskObject the object to compare with
@@ -162,11 +182,10 @@ public class Task {
      */
     @Override
     public String toString() {
-        return "T{"
-                + "Name:" + title + " \\ "
-                + description
-                + "|id:" + id
-                + "|S:" + status
-                + "}";
+        return "TASK[ID:" + id
+                + " T:" + title
+                + " S:" + status
+                + " D:" + description
+                + "]";
     }
 }

@@ -1,5 +1,7 @@
 package kanban.tasks;
 
+import static kanban.tasks.TaskType.SUB;
+
 /**
  * Represents a SubTask, which is a smaller task associated with an Epic.
  * Inherits from {@link Task} and adds a reference to its parent Epic task by ID.
@@ -7,6 +9,14 @@ package kanban.tasks;
 public class SubTask extends Task {
 
     private Integer parentId;
+
+    /**
+     * Constructor for creating a new empty SubTask with status NEW and default ID.
+     */
+    public SubTask() {
+        super();
+        parentId = null;
+    }
 
     /**
      * Constructor for creating a new SubTask with a null parent ID.
@@ -27,8 +37,23 @@ public class SubTask extends Task {
      * @param subTask the subtask to copy from
      */
     public SubTask(SubTask subTask) {
-        super(subTask.getTitle(), subTask.getDescription(), subTask.getId(), subTask.getStatus());
+        super(subTask.getId(), subTask.getTitle(), subTask.getStatus(), subTask.getDescription());
         parentId = subTask.getParentId();
+    }
+
+    /**
+     * Constructor for creating new SubTask with fromString method.
+     *
+     * @param id the subtask id
+     * @param title the subtask title
+     * @param status the subtask status
+     * @param description the subtask description
+     * @param parentId the subtask parentId
+     */
+    public SubTask(Integer id, String title, TaskStatus status,
+                   String description, Integer parentId) {
+        super(id, title, status, description);
+        this.parentId = parentId;
     }
 
     /**
@@ -60,18 +85,27 @@ public class SubTask extends Task {
     }
 
     /**
+     * Returns the task type.
+     *
+     * @return the type of the task
+     */
+    @Override
+    public TaskType getType() {
+        return SUB;
+    }
+
+    /**
      * Returns a string representation of the subtask.
      *
      * @return a formatted string with subtask details and its parent Epic ID
      */
     @Override
     public String toString() {
-        return "SB{"
-                + "Name:" + this.getTitle() + " \\ "
-                + this.getDescription()
-                + "|Id:" + this.getId()
-                + "|S:" + this.getStatus()
-                + "|ET:" + parentId
-                + "}";
+        return "SUB[ID:" + this.getId()
+                + " T:" + this.getTitle()
+                + " S:" + this.getStatus()
+                + " D:" + this.getDescription()
+                + " EP:" + parentId
+                + "]";
     }
 }

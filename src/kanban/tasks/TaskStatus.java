@@ -3,9 +3,9 @@ package kanban.tasks;
 /**
  * Represents the possible statuses for a task in the Kanban system.
  * A task can be in one of the following states:
- * - {@link TaskStatus#NEW} - Task has just been created and is not yet started.</li>
- * - {@link TaskStatus#IN_PROGRESS} - Task is currently being worked on.</li>
- * - {@link TaskStatus#DONE} - Task has been completed.</li>
+ * - {@link TaskStatus#NEW} - Task has just been created and is not yet started.
+ * - {@link TaskStatus#IN_PROGRESS} - Task is currently being worked on.
+ * - {@link TaskStatus#DONE} - Task has been completed.
  */
 public enum TaskStatus {
     /**
