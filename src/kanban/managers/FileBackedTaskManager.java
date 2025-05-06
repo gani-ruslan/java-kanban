@@ -61,7 +61,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
             boolean isParsed = false;
 
-            for (String fileRawString : loadedCsvFile.get().split("\n")) {
+            Optional<List<String>> optionalRawString =
+                    taskManager.csvString.csvStringSplit(loadedCsvFile.get());
+            if (optionalRawString.isEmpty()) {
+                return taskManager;
+            }
+
+            for (String fileRawString : optionalRawString.get()) {
                 if (fileRawString.equals(taskManager.csvString.getCsvHeader())) {
                     isParsed = true;
 

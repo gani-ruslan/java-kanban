@@ -73,5 +73,29 @@ public class CsvStringTest {
         }
     }
 
+    @Test
+    void givenCsvString_whenCsvStringSeparateWithCrLf_thenCorrectlySplitToCsvRecords() {
+        String testCsvString = "Name,Comment\n"
+                + "\"Alice\",\"Hello, Bob\n"
+                + "\"\"Yes\"\", I agree\"\n"
+                + "Bob,\"Plain comment\"\n"
+                + ",Blank name\n"
+                + "\"Charlie\",";
+
+        List<String> correctCsvSeparation = List.of(
+                "Name,Comment",
+                "\"Alice\",\"Hello, Bob\"\"Yes\"\", I agree\"",
+                "Bob,\"Plain comment\"",
+                ",Blank name",
+                "\"Charlie\","
+        );
+
+        CsvString csvString = new CsvString();
+        Optional<List<String>> splitCsvStrings = csvString.csvStringSplit(testCsvString);
+        assertTrue(splitCsvStrings.isPresent());
+        assertEquals(splitCsvStrings.get(), correctCsvSeparation);
+    }
+
+
 }
 
