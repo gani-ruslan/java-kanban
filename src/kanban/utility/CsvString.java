@@ -139,10 +139,10 @@ public class CsvString {
                 case '"' -> {
                     if (parseString.charAt(currentPosition + 1) != '"') {
                         isBetweenQuotes = !isBetweenQuotes;
-                        currentPosition += 1;
                     } else {
-                        currentPosition += 2;
+                        currentPosition += 1;
                     }
+                    currentPosition += 1;
                 }
                 case ',' -> {
                     if (!isBetweenQuotes) {
@@ -184,5 +184,80 @@ public class CsvString {
             }
         }
         return Optional.empty();
+    }
+
+    /**
+     * Splits a CSV-formatted string into a list of individual CSV lines,
+     * preserving quoted values that may span multiple lines.
+     * This method automatically detects the line separator used in the input
+     * (supports {@code \n}, {@code \r\n}, and {@code \r}), and then parses the CSV
+     * content, ensuring that lines enclosed in quotes and possibly spanning multiple
+     * rows are kept together.
+     * Quotes are assumed to be standard CSV-style: double quotes {@code "} are used
+     * to enclose fields that may contain newlines or other quotes. Escaped quotes
+     * are represented by two double quotes {@code ""}.
+     *
+     * @param csvString the input CSV string to split, possibly containing quoted lines
+     *                  with embedded newlines
+     * @return an {@link Optional} containing a list of parsed CSV lines, or
+     *         {@link Optional#empty()} if the input is blank or no valid lines are found
+     */
+    public Optional<List<String>> csvStringSplit(String csvString) {
+
+        // Default separator
+        String lineSeparator = "\n";
+
+        // Line separator detector
+        if (csvString.contains("\r\n")) {
+            lineSeparator = "\r\n";
+        } else if (csvString.contains("\r")) {
+            lineSeparator = "\r";
+        }
+
+        // Splitting input string
+        String[] splitCsvString = csvString.split(lineSeparator);
+        if (splitCsvString.length == 1 && splitCsvString[0].isBlank()) {
+            return Optional.empty();
+        }
+
+        // Init split process
+        List<String> completedStrings = new ArrayList<>();
+        StringBuilder processString = new StringBuilder();
+        int globalElementsCounter = 0;
+        int currentPosition = 0;
+        boolean isBetweenQuotes = false;
+
+        while (globalElementsCounter != splitCsvString.length) {
+
+            if (isBetweenQuotes) {
+                processString.append(splitCsvString[globalElementsCounter]);
+            } else {
+                if (!processString.isEmpty()) {
+                    completedStrings.add(processString.toString());
+                }
+                processString = new StringBuilder(splitCsvString[globalElementsCounter]);
+                currentPosition = 0;
+            }
+
+            globalElementsCounter += 1;
+
+            do {
+                if (processString.charAt(currentPosition) == '"') {
+                    if (currentPosition + 1 == processString.length()
+                            || processString.charAt(currentPosition + 1) != '"') {
+                        isBetweenQuotes = !isBetweenQuotes;
+                    } else {
+                        currentPosition += 1;
+                    }
+                }
+                currentPosition += 1;
+            } while (processString.length() != currentPosition);
+        }
+
+        if (!isBetweenQuotes && !processString.isEmpty()) {
+            completedStrings.add(processString.toString());
+        }
+
+        return completedStrings.isEmpty() ? Optional.empty() : Optional.of(completedStrings);
     }
 }
