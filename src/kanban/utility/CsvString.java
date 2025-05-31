@@ -204,18 +204,8 @@ public class CsvString {
      */
     public Optional<List<String>> csvStringSplit(String csvString) {
 
-        // Default separator
-        String lineSeparator = "\n";
-
-        // Line separator detector
-        if (csvString.contains("\r\n")) {
-            lineSeparator = "\r\n";
-        } else if (csvString.contains("\r")) {
-            lineSeparator = "\r";
-        }
-
         // Splitting input string
-        String[] splitCsvString = csvString.split(lineSeparator);
+        String[] splitCsvString = csvString.split("\\R");
         if (splitCsvString.length == 1 && splitCsvString[0].isBlank()) {
             return Optional.empty();
         }

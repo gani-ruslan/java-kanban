@@ -2,68 +2,108 @@ package kanban.tasks;
 
 import static kanban.tasks.TaskType.EPIC;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Represents an Epic task, which can contain multiple subtasks.
- * Inherits all fields from {@link Task} and adds a list of subtask IDs.
+ * Inherits from {@code Task} and adds a list of associated subtask IDs.
  */
 public class Epic extends Task {
 
     private final List<Integer> subTaskIdList;
+    private LocalDateTime endTime;
 
     /**
-     * Constructor for creating a new empty Epic with status NEW and default ID.
+     * Creates an empty epic with default values.
      */
     public Epic() {
         super();
         subTaskIdList = new ArrayList<>();
+        endTime = LocalDateTime.MIN;
     }
 
     /**
-     * Constructor for creating a new Epic with an empty list of subtasks.
+     * Creates an epic with title and description.
      *
      * @param title       the epic title
      * @param description the epic description
      */
-    public Epic(String title,
-                String description) {
-
+    public Epic(String title, String description) {
         super(title, description);
         subTaskIdList = new ArrayList<>();
+        endTime = LocalDateTime.MIN;
     }
 
     /**
-     * Copy constructor for Epic.
+     * Creates an epic with ID, title and description.
      *
-     * @param epic the epic to copy from
+     * @param id          the epic ID
+     * @param title       the epic title
+     * @param description the epic description
+     */
+    public Epic(Integer id, String title, String description) {
+        super(id, title, description);
+        subTaskIdList = new ArrayList<>();
+        endTime = LocalDateTime.MIN;
+    }
+
+    /**
+     * Full constructor for Epic.
+     *
+     * @param id          the epic ID
+     * @param title       the epic title
+     * @param status      the status of the epic
+     * @param description the epic description
+     * @param startTime   the start time
+     * @param duration    the duration
+     */
+    public Epic(Integer id, String title, TaskStatus status, String description,
+                LocalDateTime startTime, Duration duration) {
+        super(id, title, status, description, startTime, duration);
+        this.subTaskIdList = new ArrayList<>();
+        this.endTime = LocalDateTime.MIN;
+    }
+
+    /**
+     * Copy constructor.
+     *
+     * @param epic the epic to copy
      */
     public Epic(Epic epic) {
-        super(epic.getId(), epic.getTitle(), epic.getStatus(), epic.getDescription());
-        subTaskIdList = epic.getSubIdList();
+        super(epic.getId(), epic.getTitle(), epic.getStatus(), epic.getDescription(),
+                epic.getStartTime(), epic.getDuration());
+        this.subTaskIdList = epic.getSubIdList();
+        this.endTime = epic.getEndTime();
     }
 
     /**
-     * Constructor for creating new SubTask with fromString method.
+     * Sets the end time of the epic.
      *
-     * @param id the subtask id
-     * @param title the subtask title
-     * @param status the subtask status
-     * @param description the subtask description
+     * @param endTime the new end time
      */
-    public Epic(Integer id, String title, TaskStatus status, String description) {
-        super(id, title, status, description);
-        this.subTaskIdList = new ArrayList<>();
+    public void setEndTime(LocalDateTime endTime) {
+        if (endTime != null) {
+            this.endTime = endTime;
+        }
     }
 
     /**
-     * Adds a subtask ID to the epic.
-     * Subtask ID must not be null, must not match the epic's own ID,
-     * and must not already be present in the list.
+     * Returns the end time of the epic.
      *
-     * @param subId the ID of the subtask to add
-     * @throws IllegalArgumentException if subId is null or equal to the epic's own ID
+     * @return the end time
+     */
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    /**
+     * Adds a subtask ID to this epic.
+     *
+     * @param subId the subtask ID
+     * @throws IllegalArgumentException if subId is null or equals the epic's ID
      */
     public void addSubId(Integer subId) {
         if (subId == null) {
@@ -72,18 +112,16 @@ public class Epic extends Task {
         if (subId.equals(this.getId())) {
             throw new IllegalArgumentException("subId cannot have the same Id as its epic.");
         }
-        if (subTaskIdList.contains(subId)) {
-            return;
+        if (!subTaskIdList.contains(subId)) {
+            subTaskIdList.add(subId);
         }
-        subTaskIdList.add(subId);
     }
 
     /**
-     * Removes a subtask ID from the epic.
-     * Subtask ID must not be null and must not match the epic's own ID.
+     * Removes a subtask ID from this epic.
      *
-     * @param subId the ID of the subtask to remove
-     * @throws IllegalArgumentException if subId is null or equal to the epic's own ID
+     * @param subId the subtask ID to remove
+     * @throws IllegalArgumentException if subId is null or equals the epic's ID
      */
     public void removeSubId(Integer subId) {
         if (subId == null) {
@@ -96,18 +134,18 @@ public class Epic extends Task {
     }
 
     /**
-     * Returns the list of subtask IDs associated with this epic.
+     * Returns the list of associated subtask IDs.
      *
-     * @return a list of subtask IDs
+     * @return list of subtask IDs
      */
     public List<Integer> getSubIdList() {
         return subTaskIdList;
     }
 
     /**
-     * Returns the task type.
+     * Returns the type of this task.
      *
-     * @return the type of the task
+     * @return {@code TaskType.EPIC}
      */
     @Override
     public TaskType getType() {
@@ -115,9 +153,9 @@ public class Epic extends Task {
     }
 
     /**
-     * Returns a string representation of the epic task.
+     * Returns a string representation of the epic.
      *
-     * @return a formatted string with epic details and its subtasks
+     * @return formatted string with epic details and subtasks
      */
     @Override
     public String toString() {
@@ -125,7 +163,10 @@ public class Epic extends Task {
                 + " T:" + this.getTitle()
                 + " S:" + this.getStatus()
                 + " D:" + this.getDescription()
-                + " SB:" + this.subTaskIdList.toString()
+                + " ST:" + this.getStartTime()
+                + " DR:" + this.getDuration()
+                + " ET:" + getEndTime()
+                + " SB:" + subTaskIdList
                 + "]";
     }
 }

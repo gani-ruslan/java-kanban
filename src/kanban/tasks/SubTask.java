@@ -2,77 +2,79 @@ package kanban.tasks;
 
 import static kanban.tasks.TaskType.SUB;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 /**
  * Represents a SubTask, which is a smaller task associated with an Epic.
- * Inherits from {@link Task} and adds a reference to its parent Epic task by ID.
+ * Inherits from {@code Task} and adds a reference to its parent Epic task by ID.
  */
 public class SubTask extends Task {
 
     private Integer parentId;
 
     /**
-     * Constructor for creating a new empty SubTask with status NEW and default ID.
+     * Creates an empty SubTask with default values.
      */
     public SubTask() {
         super();
-        parentId = null;
+        parentId = 0;
     }
 
     /**
-     * Constructor for creating a new SubTask with a null parent ID.
+     * Creates a SubTask with a title and description.
      *
      * @param title       the subtask title
      * @param description the subtask description
      */
-    public SubTask(String title,
-                   String description) {
-
+    public SubTask(String title, String description) {
         super(title, description);
-        parentId = null;
+        parentId = 0;
     }
 
     /**
      * Copy constructor for SubTask.
      *
-     * @param subTask the subtask to copy from
+     * @param sub the subtask to copy from
      */
-    public SubTask(SubTask subTask) {
-        super(subTask.getId(), subTask.getTitle(), subTask.getStatus(), subTask.getDescription());
-        parentId = subTask.getParentId();
+    public SubTask(SubTask sub) {
+        super(sub.getId(), sub.getTitle(), sub.getStatus(), sub.getDescription(),
+                sub.getStartTime(), sub.getDuration());
+        parentId = sub.getParentId();
     }
 
     /**
-     * Constructor for creating new SubTask with fromString method.
+     * Creates a SubTask with all fields specified.
      *
-     * @param id the subtask id
-     * @param title the subtask title
-     * @param status the subtask status
+     * @param id          the subtask ID
+     * @param title       the subtask title
+     * @param status      the subtask status
      * @param description the subtask description
-     * @param parentId the subtask parentId
+     * @param parentId    the parent Epic ID
+     * @param startTime   the subtask start time
+     * @param duration    the subtask duration
      */
     public SubTask(Integer id, String title, TaskStatus status,
-                   String description, Integer parentId) {
-        super(id, title, status, description);
+                   String description, Integer parentId,
+                   LocalDateTime startTime, Duration duration) {
+        super(id, title, status, description, startTime, duration);
         this.parentId = parentId;
     }
 
     /**
      * Returns the ID of the parent Epic task.
      *
-     * @return the parent epic task ID, or null if not set
+     * @return the parent Epic ID
      */
     public Integer getParentId() {
         return parentId;
     }
 
     /**
-     * Sets the parent Epic task ID for this subtask.
-     * The Epic ID must not be the same as the SubTask's own ID,
-     * and the SubTask must not already have the same parent ID.
+     * Sets the parent Epic ID for this SubTask.
      *
-     * @param epicId the ID of the parent Epic task
-     * @throws IllegalArgumentException if the epicId is the
-     *         same as the subtask's own ID or the same as the current parent ID
+     * @param epicId the ID of the parent Epic
+     * @throws IllegalArgumentException if epicId equals the SubTask's own ID
      */
     public void setParentId(Integer epicId) {
         if (epicId.equals(this.getId())) {
@@ -85,9 +87,9 @@ public class SubTask extends Task {
     }
 
     /**
-     * Returns the task type.
+     * Returns the type of the task.
      *
-     * @return the type of the task
+     * @return {@code TaskType.SUB}
      */
     @Override
     public TaskType getType() {
@@ -95,9 +97,9 @@ public class SubTask extends Task {
     }
 
     /**
-     * Returns a string representation of the subtask.
+     * Returns a string representation of the SubTask.
      *
-     * @return a formatted string with subtask details and its parent Epic ID
+     * @return formatted string with subtask details
      */
     @Override
     public String toString() {
@@ -105,6 +107,9 @@ public class SubTask extends Task {
                 + " T:" + this.getTitle()
                 + " S:" + this.getStatus()
                 + " D:" + this.getDescription()
+                + " ST:" + this.getStartTime()
+                + " DR:" + this.getDuration()
+                + " ET:" + this.getEndTime()
                 + " EP:" + parentId
                 + "]";
     }

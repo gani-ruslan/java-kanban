@@ -4,15 +4,42 @@ import static kanban.tasks.TaskStatus.IN_PROGRESS;
 import java.io.File;
 import java.io.IOException;
 import kanban.managers.FileBackedTaskManager;
+import kanban.managers.InMemoryHistoryManager;
 import kanban.managers.Managers;
 import kanban.managers.TaskManager;
 import kanban.tasks.Epic;
 import kanban.tasks.SubTask;
 import kanban.tasks.Task;
 
+/**
+ * The entry point of the Kanban task manager application.
+ * This class demonstrates the creation and management of tasks, epics, and subtasks.
+ */
 public class Main {
 
+    /**
+     * Main method to run the application.
+     * It creates sample tasks, epics, and subtasks, and demonstrates task history management.
+     *
+     * @param args command-line arguments (not used)
+     */
     public static void main(String[] args) {
+
+        Task taskA = new Task("Task A", "Description A");
+        taskA.setId(1);
+        Task taskB = new Task("Task B", "Description B");
+        taskB.setId(2);
+        Task taskC = new Task("Task C", "Description B");
+        taskC.setId(3);
+
+        InMemoryHistoryManager historyManager = Managers.getDefaultHistory();
+        historyManager.add(taskA);
+        historyManager.add(taskB);
+        historyManager.add(taskC);
+
+        System.out.println(historyManager.getTasks());
+
+
         System.out.println("FileBackedTaskManager: test scenario A.");
         File tempFile;
         try {
@@ -24,8 +51,8 @@ public class Main {
         FileBackedTaskManager taskManager = Managers.getFileBackedManager(tempFile);
 
         // Create different task type
-        Task taskA = new Task("Task A", "Description A");
-        Task taskB = new Task("Task B", "Description B");
+        taskA = new Task("Task A", "Description A");
+        taskB = new Task("Task B", "Description B");
         Epic epicA = new Epic("Epic A", "Description C");
         Epic epicB = new Epic("Epic B", "Description D");
         SubTask subA = new SubTask("Subtask A", "Description E");
@@ -42,11 +69,11 @@ public class Main {
         taskManager.addSub(subC);
 
         // Linking epic task and subtask then updating task
-        epicA = taskManager.getEpicById(epicA.getId());
-        epicB = taskManager.getEpicById(epicB.getId());
-        subA = taskManager.getSubTaskById(subA.getId());
-        subB = taskManager.getSubTaskById(subB.getId());
-        subC = taskManager.getSubTaskById(subC.getId());
+        epicA = taskManager.getEpicById(epicA.getId()).orElseThrow();
+        epicB = taskManager.getEpicById(epicB.getId()).orElseThrow();
+        subA = taskManager.getSubTaskById(subA.getId()).orElseThrow();
+        subB = taskManager.getSubTaskById(subB.getId()).orElseThrow();
+        subC = taskManager.getSubTaskById(subC.getId()).orElseThrow();
         epicA.addSubId(subA.getId());
         epicA.addSubId(subB.getId());
         epicB.addSubId(subC.getId());
@@ -60,9 +87,9 @@ public class Main {
         taskManager.updateEpic(epicB);
 
         // Change task status then update task
-        taskA = taskManager.getTaskById(taskA.getId());
-        subA = taskManager.getSubTaskById(subA.getId());
-        subC = taskManager.getSubTaskById(subC.getId());
+        taskA = taskManager.getTaskById(taskA.getId()).orElseThrow();
+        subA = taskManager.getSubTaskById(subA.getId()).orElseThrow();
+        subC = taskManager.getSubTaskById(subC.getId()).orElseThrow();
         taskA.setStatus(IN_PROGRESS);
         subA.setStatus(IN_PROGRESS);
         subC.setStatus(DONE);
@@ -106,11 +133,11 @@ public class Main {
         showTask(manager);
 
         // Linking epic task and subtask then updating task
-        epicA = manager.getEpicById(epicA.getId());
-        epicB = manager.getEpicById(epicB.getId());
-        subA = manager.getSubTaskById(subA.getId());
-        subB = manager.getSubTaskById(subB.getId());
-        subC = manager.getSubTaskById(subC.getId());
+        epicA = manager.getEpicById(epicA.getId()).orElseThrow();
+        epicB = manager.getEpicById(epicB.getId()).orElseThrow();
+        subA = manager.getSubTaskById(subA.getId()).orElseThrow();
+        subB = manager.getSubTaskById(subB.getId()).orElseThrow();
+        subC = manager.getSubTaskById(subC.getId()).orElseThrow();
         epicA.addSubId(subA.getId());
         epicA.addSubId(subB.getId());
         epicB.addSubId(subC.getId());
@@ -128,9 +155,9 @@ public class Main {
         showTask(manager);
 
         // Change task status then update task
-        taskA = manager.getTaskById(taskA.getId());
-        subA = manager.getSubTaskById(subA.getId());
-        subC = manager.getSubTaskById(subC.getId());
+        taskA = manager.getTaskById(taskA.getId()).orElseThrow();
+        subA = manager.getSubTaskById(subA.getId()).orElseThrow();
+        subC = manager.getSubTaskById(subC.getId()).orElseThrow();
         taskA.setStatus(IN_PROGRESS);
         subA.setStatus(IN_PROGRESS);
         subC.setStatus(DONE);
@@ -175,10 +202,10 @@ public class Main {
         showTask(manager);
 
         // Linking epic task and subtask then updating task
-        epicA = manager.getEpicById(epicA.getId());
-        subA = manager.getSubTaskById(subA.getId());
-        subB = manager.getSubTaskById(subB.getId());
-        subC = manager.getSubTaskById(subC.getId());
+        epicA = manager.getEpicById(epicA.getId()).orElseThrow();
+        subA = manager.getSubTaskById(subA.getId()).orElseThrow();
+        subB = manager.getSubTaskById(subB.getId()).orElseThrow();
+        subC = manager.getSubTaskById(subC.getId()).orElseThrow();
         epicA.addSubId(subA.getId());
         epicA.addSubId(subB.getId());
         epicA.addSubId(subC.getId());

@@ -9,7 +9,7 @@ package kanban.managers;
 public class ManagerSaveException extends RuntimeException {
 
     /**
-     * Constructs a new {@code ManagerSaveException} with the specified detail message.
+     * Constructs a new ManagerSaveException with the specified detail message.
      *
      * @param message the detail message explaining the cause of the exception
      */

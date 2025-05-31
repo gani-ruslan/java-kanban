@@ -2,13 +2,14 @@ package kanban.managers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import kanban.tasks.Epic;
 import kanban.tasks.SubTask;
 import kanban.tasks.Task;
 
 /**
  * Interface for managing tasks, epics, and subtasks in the Kanban system.
- * Provides methods to add, update, remove, and retrieve tasks, epics, and subtasks.
+ * Provides methods to add, update, remove, and retrieve tasks, as well as access task history.
  */
 public interface TaskManager {
 
@@ -37,38 +38,38 @@ public interface TaskManager {
      * Retrieves a list of subtasks associated with a specific epic.
      *
      * @param epicId the ID of the epic whose subtasks are to be retrieved
-     * @return a list of subtasks associated with the specified epic
+     * @return an Optional list of subtasks for the specified epic
      */
-    List<SubTask> getEpicSubTaskList(Integer epicId);
+    Optional<List<SubTask>> getEpicSubTaskList(Integer epicId);
 
     /**
      * Retrieves a task by its ID.
      *
      * @param taskId the ID of the task to retrieve
-     * @return the task with the specified ID
+     * @return an Optional containing the task
      */
-    Task getTaskById(Integer taskId);
+    Optional<Task> getTaskById(Integer taskId);
 
     /**
      * Retrieves an epic by its ID.
      *
      * @param epicId the ID of the epic to retrieve
-     * @return the epic with the specified ID
+     * @return an Optional containing the epic
      */
-    Epic getEpicById(Integer epicId);
+    Optional<Epic> getEpicById(Integer epicId);
 
     /**
      * Retrieves a subtask by its ID.
      *
      * @param subId the ID of the subtask to retrieve
-     * @return the subtask with the specified ID
+     * @return an Optional containing the subtask
      */
-    SubTask getSubTaskById(Integer subId);
+    Optional<SubTask> getSubTaskById(Integer subId);
 
     /**
      * Retrieves the task history.
      *
-     * @return a list of tasks that are part of the history
+     * @return a list of tasks in the access history
      */
     ArrayList<Task> getHistoryTask();
 
