@@ -2,52 +2,83 @@ package kanban.managers;
 
 import static kanban.tasks.TaskStatus.DONE;
 import static kanban.tasks.TaskStatus.IN_PROGRESS;
+import static kanban.tasks.TaskStatus.NEW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 import kanban.tasks.Epic;
 import kanban.tasks.SubTask;
 import kanban.tasks.Task;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Unit tests for {@link FileBackedTaskManager}.
+ * Verifies that task persistence and restoration from file works correctly.
+ */
+class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
-public class FileBackedTaskManagerTest {
-    private FileBackedTaskManager taskManager;
-    private FileBackedTaskManager taskManagerRestored;
-    private File tempFile;
+    protected FileBackedTaskManager taskManager;
+    protected FileBackedTaskManager taskManagerRestored;
+    protected static File tempFile;
+    Task taskD;
 
+    /**
+     * Creates a new instance of FileBackedTaskManager for testing.
+     *
+     * @return a new FileBackedTaskManager instance
+     */
+    @Override
+    protected FileBackedTaskManager createTaskManager() {
+        return new FileBackedTaskManager(tempFile);
+    }
+
+    /**
+     * Initializes test environment by creating a temporary CSV file and sample tasks.
+     */
     @BeforeEach
-    void beforeEachTest() {
-        Task taskA = new Task("Task A", "Description A");
-        taskA.setId(1);
-
-        Task taskB = new Task("Task B", "Description B");
-        taskB.setId(2);
-
-        Task taskC = new Task("Task C", "Description C");
-        taskC.setId(3);
-
-        Task taskD = new Task("Task D", "Description D");
-        taskD.setId(4);
-
-        SubTask taskE = new SubTask("Subtask E", "Description E");
-        taskE.setId(5);
-        taskE.setParentId(12);
-
+    void setUp() {
         try {
             tempFile = File.createTempFile("_tempCSV_", ".csv");
         } catch (IOException e) {
             throw new AssertionError("Can't create temporary file.", e);
         }
+        taskManager = createTaskManager();
+        super.beforeEachTest();
+
+        LocalDateTime testStartTime = LocalDateTime.of(2025, 1, 1, 10, 0, 0);
+
+        taskD = new Task(0, "Task D", NEW, "Task D description",
+                testStartTime.plusMinutes(30), Duration.ofMinutes(10));
+
+        subA = new SubTask(0, "Sub A", NEW, "SubTask A description", 0,
+                testStartTime.plusMinutes(40), Duration.ofMinutes(10));
+        subB = new SubTask(0, "Sub B", NEW, "SubTask B description", 0,
+                testStartTime.plusMinutes(50), Duration.ofMinutes(10));
+        subC = new SubTask(0, "Sub C", NEW, "SubTask C description", 0,
+                testStartTime.plusMinutes(60), Duration.ofMinutes(10));
     }
 
+    /**
+     * Ensures the temporary file is removed after each test.
+     */
+    @AfterEach
+    void tearDown() {
+        tempFile.deleteOnExit();
+    }
+
+    /**
+     * Verifies that a newly created FileBackedTaskManager is initially empty.
+     */
     @Test
-    void givenNewTaskManager_whenInitialized_thenTasksStructureEmpty() {
+    void shouldInitializeEmptyManager() {
         taskManager = Managers.getFileBackedManager(tempFile);
         assertNotNull(taskManager);
         assertTrue(taskManager.getHistoryTask().isEmpty());
@@ -56,59 +87,33 @@ public class FileBackedTaskManagerTest {
         assertTrue(taskManager.getSubList().isEmpty());
     }
 
+    /**
+     * Verifies that saving and loading an empty task manager works as expected.
+     */
     @Test
-    void givenTaskManager_whenEmptyTaskSaved_thenEmptyTaskLoaded() {
+    void shouldSaveAndLoadEmptyTaskManagerCorrectly() {
         taskManager = Managers.getFileBackedManager(tempFile);
-        assertTrue(taskManager.getHistoryTask().isEmpty());
         assertTrue(taskManager.getTaskList().isEmpty());
-        assertTrue(taskManager.getEpicList().isEmpty());
-        assertTrue(taskManager.getSubList().isEmpty());
 
-        // Create different task type
-        Task taskA = new Task("Task A", "Description A");
-
-        // Adding task into manager
         taskManager.addTask(taskA);
-
-        // Checking manager storage maps
-        assertTrue(taskManager.getHistoryTask().isEmpty());
-        assertFalse(taskManager.getTaskList().isEmpty());
         assertEquals(1, taskManager.getTaskList().size());
 
-        // Delete all task
         taskManager.removeAllTask();
-
-        // Checking manager storage maps
-        assertTrue(taskManager.getHistoryTask().isEmpty());
         assertTrue(taskManager.getTaskList().isEmpty());
 
-        // Load taskManager in new FileBackedTaskManager object
         taskManagerRestored = FileBackedTaskManager.loadFromFile(tempFile);
-        tempFile.deleteOnExit();
-
-        String restoredString = composeTaskString(taskManagerRestored);
-        String originalString = composeTaskString(taskManager);
-        assertEquals(originalString, restoredString);
+        String restored = composeTaskString(taskManagerRestored);
+        String original = composeTaskString(taskManager);
+        assertEquals(original, restored);
     }
 
+    /**
+     * Verifies that tasks and their states are correctly persisted and restored from file.
+     */
     @Test
-    void givenTaskManager_whenTaskSaved_thenSameTaskLoadedInNewTaskManager() {
+    void shouldPersistAndRestoreTasksCorrectly() {
         taskManager = Managers.getFileBackedManager(tempFile);
-        assertTrue(taskManager.getHistoryTask().isEmpty());
-        assertTrue(taskManager.getTaskList().isEmpty());
-        assertTrue(taskManager.getEpicList().isEmpty());
-        assertTrue(taskManager.getSubList().isEmpty());
 
-        // Create different task type
-        Task taskA = new Task("Task A", "Description A");
-        Task taskB = new Task("Task B", "Description B");
-        Epic epicA = new Epic("Epic A", "Description C");
-        Epic epicB = new Epic("Epic B", "Description D");
-        SubTask subA = new SubTask("Subtask A", "Description E");
-        SubTask subB = new SubTask("Subtask B", "Description F");
-        SubTask subC = new SubTask("Subtask C", "Description G");
-
-        // Adding task into manager
         taskManager.addTask(taskA);
         taskManager.addTask(taskB);
         taskManager.addEpic(epicA);
@@ -117,73 +122,61 @@ public class FileBackedTaskManagerTest {
         taskManager.addSub(subB);
         taskManager.addSub(subC);
 
-        // Checking manager storage maps
-        assertTrue(taskManager.getHistoryTask().isEmpty());
-        assertFalse(taskManager.getTaskList().isEmpty());
-        assertEquals(2, taskManager.getTaskList().size());
-        assertFalse(taskManager.getEpicList().isEmpty());
-        assertEquals(2, taskManager.getEpicList().size());
-        assertFalse(taskManager.getSubList().isEmpty());
-        assertEquals(3, taskManager.getSubList().size());
+        // Link epics and subtasks
+        epicA = taskManager.getEpicById(epicA.getId()).orElseThrow();
+        epicB = taskManager.getEpicById(epicB.getId()).orElseThrow();
+        subA = taskManager.getSubTaskById(subA.getId()).orElseThrow();
+        subB = taskManager.getSubTaskById(subB.getId()).orElseThrow();
+        subC = taskManager.getSubTaskById(subC.getId()).orElseThrow();
 
-        // Linking epic task and subtask then updating task
-        epicA = taskManager.getEpicById(epicA.getId());
-        epicB = taskManager.getEpicById(epicB.getId());
-        subA = taskManager.getSubTaskById(subA.getId());
-        subB = taskManager.getSubTaskById(subB.getId());
-        subC = taskManager.getSubTaskById(subC.getId());
         epicA.addSubId(subA.getId());
         epicA.addSubId(subB.getId());
         epicB.addSubId(subC.getId());
+
         subA.setParentId(epicA.getId());
         subB.setParentId(epicA.getId());
         subC.setParentId(epicB.getId());
+
         taskManager.updateSub(subA);
         taskManager.updateSub(subB);
         taskManager.updateSub(subC);
         taskManager.updateEpic(epicA);
         taskManager.updateEpic(epicB);
 
-        // Checking epic<->subtask link
-        assertTrue(taskManager.getEpicById(epicA.getId()).getSubIdList().contains(subA.getId()));
-        assertTrue(taskManager.getEpicById(epicA.getId()).getSubIdList().contains(subB.getId()));
-        assertTrue(taskManager.getEpicById(epicB.getId()).getSubIdList().contains(subC.getId()));
-        assertEquals(taskManager.getSubTaskById(subA.getId()).getParentId(), epicA.getId());
-        assertEquals(taskManager.getSubTaskById(subB.getId()).getParentId(), epicA.getId());
-        assertEquals(taskManager.getSubTaskById(subC.getId()).getParentId(), epicB.getId());
-
-        // Change task status then update task
-        taskA = taskManager.getTaskById(taskA.getId());
-        subA = taskManager.getSubTaskById(subA.getId());
-        subC = taskManager.getSubTaskById(subC.getId());
+        // Modify task statuses
+        taskA = taskManager.getTaskById(taskA.getId()).orElseThrow();
         taskA.setStatus(IN_PROGRESS);
         subA.setStatus(IN_PROGRESS);
         subC.setStatus(DONE);
+
         taskManager.updateTask(taskA);
         taskManager.updateSub(subA);
         taskManager.updateSub(subC);
 
-        // Load taskManager in new FileBackedTaskManager object
         taskManagerRestored = FileBackedTaskManager.loadFromFile(tempFile);
-        tempFile.deleteOnExit();
-
-        String originalString = composeTaskString(taskManager);
-        String restoredString = composeTaskString(taskManagerRestored);
-        assertEquals(originalString, restoredString);
+        String original = composeTaskString(taskManager);
+        String restored = composeTaskString(taskManagerRestored);
+        assertEquals(original, restored);
     }
 
+    /**
+     * Converts all tasks, epics, and subtasks from a task manager to a string.
+     *
+     * @param manager the task manager
+     * @return string representation of all tasks
+     */
     private String composeTaskString(TaskManager manager) {
         StringBuilder string = new StringBuilder();
-
         for (Task task : manager.getTaskList()) {
             string.append(task.toString());
         }
         for (Epic epic : manager.getEpicList()) {
             string.append(epic.toString());
-            if (!epic.getSubIdList().isEmpty()) {
-                for (Integer subTaskId : epic.getSubIdList()) {
-                    string.append(manager.getSubTaskById(subTaskId).toString());
-                }
+            for (Integer subTaskId : epic.getSubIdList()) {
+                SubTask subTask = manager.getSubTaskById(subTaskId).orElseThrow(() ->
+                        new NoSuchElementException("SubTask with id: "
+                                + subTaskId + " not found in taskManager."));
+                string.append(subTask.toString());
             }
         }
         return string.toString();

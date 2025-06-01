@@ -3,8 +3,8 @@ package kanban.managers;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import kanban.history.Node;
 import kanban.tasks.Task;
+import kanban.utility.HistoryNode;
 
 /**
  * In-memory implementation of the HistoryManager interface, which keeps track of tasks' history.
@@ -12,17 +12,17 @@ import kanban.tasks.Task;
  */
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private final Map<Integer, Node> historyMap;
-    private Node firstNode;
-    private Node lastNode;
+    private final Map<Integer, HistoryNode> historyMap;
+    private HistoryNode firstHistoryNode;
+    private HistoryNode lastHistoryNode;
 
     /**
      * Constructs an empty InMemoryHistoryManager with no tasks in history.
      */
     public InMemoryHistoryManager() {
         historyMap = new HashMap<>();
-        firstNode = null;
-        lastNode = null;
+        firstHistoryNode = null;
+        lastHistoryNode = null;
     }
 
     /**
@@ -34,12 +34,11 @@ public class InMemoryHistoryManager implements HistoryManager {
      */
     @Override
     public void add(Task task) {
-
         if (task == null) {
             throw new IllegalArgumentException("Task must not be null.");
         }
 
-        Node newNode = new Node(null, null, new Task(task));
+        HistoryNode newHistoryNode = new HistoryNode(null, null, new Task(task));
 
         // Remove existing task if it exists in history
         if (historyMap.containsKey(task.getId())) {
@@ -48,54 +47,53 @@ public class InMemoryHistoryManager implements HistoryManager {
 
         // Add new task as the last node in the history
         if (historyMap.isEmpty()) {
-            firstNode = newNode;
+            firstHistoryNode = newHistoryNode;
         }
-        if (lastNode != null) {
-            lastNode.setNext(newNode);
+        if (lastHistoryNode != null) {
+            lastHistoryNode.setNext(newHistoryNode);
         }
 
-        newNode.setPrevious(lastNode);
-        lastNode = newNode;
-        historyMap.put(task.getId(), newNode);
+        newHistoryNode.setPrevious(lastHistoryNode);
+        lastHistoryNode = newHistoryNode;
+        historyMap.put(task.getId(), newHistoryNode);
     }
 
     /**
      * Removes a task from the history based on its ID.
      *
-     * @param taskId the ID of the task to be removed from history
-     * @throws IllegalArgumentException if the taskId is null
+     * @param id the ID of the task to be removed from history
+     * @throws IllegalArgumentException if the task ID is null
      */
     @Override
-    public void remove(Integer taskId) {
-
-        if (taskId == null) {
-            throw new IllegalArgumentException("taskId must not be null.");
+    public void remove(Integer id) {
+        if (id == null) {
+            throw new IllegalArgumentException("id must not be null.");
         }
 
-        if (!historyMap.containsKey(taskId)) {
+        if (!historyMap.containsKey(id)) {
             return;
         }
 
-        Node taskNode = historyMap.get(taskId);
-        Node previousNode = taskNode.getPrevious();
-        Node nextNode = taskNode.getNext();
+        HistoryNode taskHistoryNode = historyMap.get(id);
+        HistoryNode previousHistoryNode = taskHistoryNode.getPrevious();
+        HistoryNode nextHistoryNode = taskHistoryNode.getNext();
 
-        if (taskNode.equals(lastNode)) {
-            if (previousNode != null) {
-                previousNode.setNext(null);
-                lastNode = previousNode;
+        if (taskHistoryNode.equals(lastHistoryNode)) {
+            if (previousHistoryNode != null) {
+                previousHistoryNode.setNext(null);
+                lastHistoryNode = previousHistoryNode;
             }
-        } else if (taskNode.equals(firstNode)) {
-            if (nextNode != null) {
-                nextNode.setPrevious(null);
-                firstNode = nextNode;
+        } else if (taskHistoryNode.equals(firstHistoryNode)) {
+            if (nextHistoryNode != null) {
+                nextHistoryNode.setPrevious(null);
+                firstHistoryNode = nextHistoryNode;
             }
         } else {
-            previousNode.setNext(nextNode);
-            nextNode.setPrevious(previousNode);
+            previousHistoryNode.setNext(nextHistoryNode);
+            nextHistoryNode.setPrevious(previousHistoryNode);
         }
 
-        historyMap.remove(taskId);
+        historyMap.remove(id);
     }
 
     /**
@@ -111,12 +109,12 @@ public class InMemoryHistoryManager implements HistoryManager {
             return historyOrdered;
         }
 
-        Node currentNode = firstNode;
+        HistoryNode currentHistoryNode = firstHistoryNode;
 
         do {
-            historyOrdered.add(currentNode.getNodeTask());
-            currentNode = currentNode.getNext();
-        } while (currentNode != null);
+            historyOrdered.add(currentHistoryNode.getNodeTask());
+            currentHistoryNode = currentHistoryNode.getNext();
+        } while (currentHistoryNode != null);
 
         return historyOrdered;
     }

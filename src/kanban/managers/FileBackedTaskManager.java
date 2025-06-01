@@ -5,6 +5,8 @@ import static kanban.tasks.TaskStatus.valueOf;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +18,7 @@ import kanban.tasks.Task;
 import kanban.tasks.TaskStatus;
 import kanban.tasks.TaskType;
 import kanban.utility.CsvString;
+import kanban.utility.TimeSchedule;
 
 /**
  * FileBackedTaskManager is an implementation of InMemoryTaskManager that adds
@@ -36,7 +39,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
      */
     FileBackedTaskManager(File taskFile) {
         this.taskFile = taskFile;
-        csvString = new CsvString("id,type,name,status,description,epic");
+        csvString = new CsvString("id,type,name,status,description,epic,start,duration");
     }
 
     /**
@@ -98,9 +101,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     if (subTask.getParentId() == 0) {
                         continue;
                     }
-                    taskManager.getEpicById(
-                            subTask.getParentId()).addSubId(subTask.getId()
-                    );
+                    taskManager.getEpicById(subTask.getParentId())
+                            .ifPresent(epic -> epic.addSubId(subTask.getId())
+                            );
                 }
 
                 for (Epic epic : taskManager.getEpicList()) {
@@ -274,12 +277,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 taskStorageMap, subStorageMap);
 
         StringBuilder tasksData = new StringBuilder(csvString.getCsvHeader() + "\n");
-        for (Map<Integer, ? extends Task> tasksMap : allTask) {
-            for (Task task : tasksMap.values()) {
-                Optional<String> composedCsvTaskString = toString(task);
-                composedCsvTaskString.ifPresent(s -> tasksData.append(s).append("\n"));
-            }
-        }
+        allTask.stream()
+                .flatMap(map -> map.values().stream())
+                .map(this::toString)
+                    .forEach(optionalCsvTaskString ->
+                            optionalCsvTaskString.ifPresent(
+                                    csvLine -> tasksData.append(csvLine).append("\n")
+                            )
+                );
         saveFile(taskFile, tasksData.toString());
     }
 
@@ -300,6 +305,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         taskMap.put("status", task.getStatus().toString());
         taskMap.put("description", task.getDescription());
         taskMap.put("epic", "");
+        taskMap.put("start", TimeSchedule.composeLocalDateTime(task.getStartTime()));
+        taskMap.put("duration", TimeSchedule.composeDuration(task.getDuration()));
 
         // Adding details from different task types
         if (task instanceof SubTask sub) {
@@ -318,6 +325,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
      * @param taskMap the map representing the task
      * @return an Optional containing the task or empty if validation failed
      */
+
     private Optional<Task> createTaskFromMap(Map<String, String> taskMap) {
 
         ValidData validData;
@@ -332,15 +340,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         switch (validData.type) {
             case TASK -> {
                 return Optional.of(new Task(validData.id, validData.name, validData.status,
-                        validData.description));
+                        validData.description,
+                        validData.startTime, validData.duration));
             }
             case SUB -> {
                 return Optional.of(new SubTask(validData.id, validData.name, validData.status,
-                        validData.description, validData.epic));
+                        validData.description, validData.epic,
+                        validData.startTime, validData.duration));
             }
             case EPIC -> {
                 return Optional.of(new Epic(validData.id, validData.name, validData.status,
-                        validData.description));
+                        validData.description, validData.startTime, validData.duration));
             }
             default -> {
                 return Optional.empty();
@@ -357,9 +367,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
      * @param description task description
      * @param type task type
      * @param epic parent epic id (for subtasks)
+     * @param startTime task start time
+     * @param duration task duration
      */
     private record ValidData(Integer id, String name, TaskStatus status,
-                             String description, TaskType type, Integer epic) {
+                             String description, TaskType type, Integer epic,
+                             LocalDateTime startTime, Duration duration) {
     }
 
     /**
@@ -375,15 +388,20 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private Optional<ValidData> validateValues(Map<String, String> taskMap) {
         try {
             // Parse task fields from the map
-            int id = Integer.parseInt(taskMap.getOrDefault("id", ""));
+            int id = Integer.parseInt(taskMap.getOrDefault("id", "0"));
             int epic = parseEpicInt(taskMap.get("epic")).orElse(0);
             String name = taskMap.getOrDefault("name", "");
             String description = taskMap.getOrDefault("description", "");
             TaskStatus status = valueOf(taskMap.getOrDefault("status", ""));
             TaskType type = TaskType.valueOf(taskMap.getOrDefault("type", ""));
+            LocalDateTime startTime = TimeSchedule.parseLocalDateTime(taskMap.get("start"))
+                    .orElse(LocalDateTime.MIN);
+            Duration duration = TimeSchedule.parseDurationFromSeconds(taskMap.get("duration"))
+                    .orElse(Duration.ZERO);
 
             // Return the validated data in an Optional
-            return Optional.of(new ValidData(id, name, status, description, type, epic));
+            return Optional.of(new ValidData(id, name, status, description,
+                    type, epic, startTime, duration));
 
         } catch (IllegalArgumentException | NullPointerException e) {
             // If any parsing or validation fails, return an empty Optional
@@ -436,7 +454,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 return Optional.of(parsedTaskData);
             }
         }
-
         return Optional.empty();
     }
 
@@ -452,8 +469,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         StringBuilder composeString = new StringBuilder();
         Map<Integer, String> orderedPattern = new TreeMap<>(csvHeaderMap);
+
         for (Map.Entry<Integer, String> entry : orderedPattern.entrySet()) {
-            composeString.append(csvString.toCsvEntry(taskMap.get(entry.getValue()))).append(",");
+            composeString.append(
+                    csvString.toCsvEntry(
+                            taskMap.get(entry.getValue())
+                    )
+            ).append(",");
         }
 
         if (!composeString.isEmpty()) {
@@ -476,10 +498,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
      * @throws ManagerSaveException if the file cannot be written
      */
     private void saveFile(File savingFile, String taskFileData) {
-        try {
-            Files.writeString(savingFile.toPath(), taskFileData);
-        } catch (IOException e) {
-            throw new ManagerSaveException("Cannot save taskFile. Error: " + e.getMessage());
+        if (savingFile != null) {
+            try {
+                Files.writeString(savingFile.toPath(), taskFileData);
+            } catch (IOException e) {
+                throw new ManagerSaveException("Cannot save taskFile. Error: " + e.getMessage());
+            }
         }
     }
 

@@ -8,40 +8,53 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class SubTaskTest {
+/**
+ * Unit tests for the {@link SubTask} class to verify parent ID handling
+ * and equality behavior.
+ */
+public class SubTaskTest {
 
     private static SubTask subA;
     private static SubTask subB;
     private static Epic epicA;
 
     @BeforeAll
-    static void beforeAllTests() {
+    static void setUpOnce() {
         subA = new SubTask("Sub A", "Description A");
         subB = new SubTask("Sub B", "Description B");
         epicA = new Epic("Epic A", "Description C");
     }
 
     @BeforeEach
-    void beforeEachTest() {
+    void setUp() {
         subA.setId(1);
         subB.setId(2);
         epicA.setId(3);
     }
 
+    /**
+     * Verifies that a subtask cannot reference itself as its own parent epic.
+     */
     @Test
-    void givenSubtask_whenSettingItAsItsOwnEpic_thenThrowException() {
+    void shouldThrowWhenSubtaskParentIsItself() {
         assertThrows(IllegalArgumentException.class, () -> subA.setParentId(subA.getId()));
     }
 
+    /**
+     * Verifies that setting an epic as a subtask's parent stores the correct parent ID.
+     */
     @Test
-    void givenSubTask_whenSetSubParentTaskAsEpic_thenSubParentTaskEqualEpicId() {
+    void shouldStoreParentEpicIdInSubtask() {
         subA.setParentId(epicA.getId());
         assertNotNull(subA.getParentId());
-        assertEquals(subA.getParentId(), epicA.getId());
+        assertEquals(epicA.getId(), subA.getParentId());
     }
 
+    /**
+     * Verifies that two subtasks with the same ID are considered equal.
+     */
     @Test
-    void givenTwoSubWithSameId_whenIdEquals_thenSubEquals() {
+    void shouldConsiderSubtasksEqualIfTheyHaveSameId() {
         subA.setId(1);
         subB.setId(1);
         assertEquals(subA, subB);
