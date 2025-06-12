@@ -194,7 +194,18 @@ public class InMemoryTaskManager implements TaskManager {
             taskPriorityOrderList.add(new SubTask(sub));
         }
 
+        if (sub.getParentId() != 0) {
+            Epic epic = epicStorageMap.get(sub.getParentId());
+            if (epic != null) {
+                epic.addSubId(sub.getId());
+            } else {
+                throw new NoSuchElementException("SubTask linked to epic with id: "
+                        + sub.getParentId() + " not found.");
+            }
+        }
+
         subStorageMap.put(sub.getId(), new SubTask(sub));
+
     }
 
     /**
@@ -210,6 +221,22 @@ public class InMemoryTaskManager implements TaskManager {
         }
         if (epic.getId() == null || epic.getId() == 0) {
             epic.setId(generateId());
+        }
+        if (!epic.getSubIdList().isEmpty()) {
+            epic.getSubIdList().forEach(subId -> {
+                if (subStorageMap.get(subId) != null) {
+                    if (subStorageMap.get(subId).getParentId() == 0
+                            || subStorageMap.get(subId).getParentId().equals(epic.getId())) {
+                        subStorageMap.get(subId).setParentId(epic.getId());
+                    } else {
+                        throw new IllegalStateException("Data inconsistency: "
+                                + "Epic with id: " + epic.getId()
+                                + " lists child sub id: " + subId
+                                + ", but SubTask with this id, already linked "
+                                + "to another Epic task.");
+                    }
+                }
+            });
         }
         epicStorageMap.put(epic.getId(), new Epic(epic));
     }

@@ -24,7 +24,6 @@ public class Main {
      * @param args command-line arguments (not used)
      */
     public static void main(String[] args) {
-
         Task taskA = new Task("Task A", "Description A");
         taskA.setId(1);
         Task taskB = new Task("Task B", "Description B");

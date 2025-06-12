@@ -88,7 +88,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     }
 
     /**
-     * Verifies that saving and loading an empty task manager works as expected.
+     * Verifies that saving and loading an empty task taskManager works as expected.
      */
     @Test
     void shouldSaveAndLoadEmptyTaskManagerCorrectly() {
@@ -160,9 +160,9 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     }
 
     /**
-     * Converts all tasks, epics, and subtasks from a task manager to a string.
+     * Converts all tasks, epics, and subtasks from a task taskManager to a string.
      *
-     * @param manager the task manager
+     * @param manager the task taskManager
      * @return string representation of all tasks
      */
     private String composeTaskString(TaskManager manager) {
