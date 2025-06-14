@@ -29,7 +29,7 @@ class InMemoryHistoryManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     private Task taskE;
 
     /**
-     * Creates a new in-memory task manager instance.
+     * Creates a new in-memory task taskManager instance.
      */
     @Override
     protected InMemoryTaskManager createTaskManager() {
@@ -75,7 +75,7 @@ class InMemoryHistoryManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     }
 
     /**
-     * Should return empty history on new history manager.
+     * Should return empty history on new history taskManager.
      */
     @Test
     void shouldBeEmptyWhenInitialized() {

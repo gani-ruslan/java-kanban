@@ -73,7 +73,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.addTask(taskA);
         System.out.println(taskA.getId());
         assertNotEquals(initialId, taskA.getId(),
-                "Task ID should be updated from its initial value by the manager.");
+                "Task ID should be updated from its initial value by the taskManager.");
         assertTrue(taskA.getId() != 0,
                 "Generated Task ID should not be the default 'unassigned' ID (e.g., 0).");
 
@@ -487,7 +487,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     /**
-     * Verifies that removeAllTask removes all standard tasks from the manager.
+     * Verifies that removeAllTask removes all standard tasks from the taskManager.
      */
     @Test
     void removeAllTasks_whenTasksExist_shouldLeaveTaskListEmpty() {

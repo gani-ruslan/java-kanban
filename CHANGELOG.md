@@ -4,6 +4,29 @@
 
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/) и этот проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [0.4.0] - 2025-06-12
+### Добавлено
+- Реализован HTTP API для взаимодействия с `TaskManager` через `HttpTaskServer`.
+- Добавлены обработчики (`TaskHandler`, `EpicHandler`, `SubTaskHandler`, `HistoryHandler`, `PrioritizedHandler`) для всех основных типов задач и операций.
+- Введены базовые пути API: `/tasks`, `/subtasks`, `/epics`, `/history`, `/prioritized`.
+- Добавлены коды ответов HTTP: `200 OK`, `201 Created`, `400 Bad Request`, `404 Not Found`, `500 Internal Server Error`.
+- Создан абстрактный класс `BaseHttpHandler` для унификации отправки ответов.
+- Создан обобщённый обработчик `CrudHandler` для задач с поддержкой шаблонов URI.
+- Добавлены unit-тесты HTTP-уровня для всех эндпоинтов: `HttpTaskHandlerTest`, `HttpEpicHandlerTest`, `HttpSubtaskHandlerTest`, `HttpHistoryHandlerTest`, `HttpPrioritizedHandlerTest`.
+- Использован `HttpClient` и `JUnit` для написания и структурирования тестов.
+- Создан базовый тестовый класс `HttpBaseTest` с поддержкой запуска и остановки сервера.
+- Упрощена и унифицирована архитектура HTTP-обработчиков: все классы теперь расширяют `CrudHandler`.
+- Стандартизована валидация URI с помощью регулярных выражений.
+- Улучшена централизованная маршрутизация и логика обработки запросов.
+
+### Изменено
+- Изменена корректная обработка ID при добавлении Epic и SubTask.
+- Исправлены мелкие ошибки и недочеты.
+- Обновлена документация в ряде классов.
+
+### Удалено
+- 
+
 ## [0.3.0] - 2025-05-31
 ### Добавлено
 - Добавлена возможность создавать и модифицировать задачи по времени.

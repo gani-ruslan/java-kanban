@@ -74,6 +74,15 @@ public interface TaskManager {
     ArrayList<Task> getHistoryTask();
 
     /**
+     * Retrieves a list of all tasks sorted by priority.
+     * The priority is typically determined by task start time, duration, or other predefined rules
+     * in the task manager's implementation.
+     *
+     * @return a list of tasks ordered by their priority
+     */
+    List<Task> getPrioritizedTasks();
+
+    /**
      * Adds a new task to the system.
      *
      * @param newTask the task to be added
